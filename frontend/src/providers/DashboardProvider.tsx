@@ -12,8 +12,17 @@ import { CSVRow } from "@/types/csv";
 interface DashboardContextType {
   rows: CSVRow[];
   setRows: (rows: CSVRow[]) => void;
+
   selectedFile: string;
   setSelectedFile: (name: string) => void;
+
+  headers: string[];
+  setHeaders: (headers: string[]) => void;
+
+  columnMapping: Record<string, string>;
+  setColumnMapping: (
+    mapping: Record<string, string>
+  ) => void;
 }
 
 const DashboardContext =
@@ -28,14 +37,33 @@ export function DashboardProvider({
   const [selectedFile, setSelectedFile] =
     useState("");
 
+  const [headers, setHeaders] = useState<
+    string[]
+  >([]);
+
+  const [columnMapping, setColumnMapping] =
+    useState<Record<string, string>>({});
+
   const value = useMemo(
     () => ({
       rows,
       setRows,
+
       selectedFile,
       setSelectedFile,
+
+      headers,
+      setHeaders,
+
+      columnMapping,
+      setColumnMapping,
     }),
-    [rows, selectedFile]
+    [
+      rows,
+      selectedFile,
+      headers,
+      columnMapping,
+    ]
   );
 
   return (
