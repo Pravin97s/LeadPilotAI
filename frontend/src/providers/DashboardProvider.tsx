@@ -9,7 +9,7 @@ import {
 } from "react";
 import { CSVRow } from "@/types/csv";
 
-interface DashboardContextType {
+export interface DashboardContextType {
   rows: CSVRow[];
   setRows: (rows: CSVRow[]) => void;
 
@@ -26,7 +26,9 @@ interface DashboardContextType {
 }
 
 const DashboardContext =
-  createContext<DashboardContextType | null>(null);
+  createContext<DashboardContextType | null>(
+    null
+  );
 
 export function DashboardProvider({
   children,
@@ -34,6 +36,7 @@ export function DashboardProvider({
   children: ReactNode;
 }) {
   const [rows, setRows] = useState<CSVRow[]>([]);
+
   const [selectedFile, setSelectedFile] =
     useState("");
 
@@ -74,7 +77,8 @@ export function DashboardProvider({
 }
 
 export function useDashboard() {
-  const context = useContext(DashboardContext);
+  const context =
+    useContext(DashboardContext);
 
   if (!context) {
     throw new Error(

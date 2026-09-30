@@ -6,16 +6,26 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  CartesianGrid,
+ CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
 } from "recharts";
 
 export default function LeadGrowthChart() {
-  const { rows } = useDashboard();
+  const {
+    rows,
+    columnMapping,
+  } = useDashboard();
 
-  const data = generateMonthlyChart(rows);
+  const data = generateMonthlyChart(
+    rows,
+    columnMapping["Date"] || "createdAt"
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">

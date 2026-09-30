@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import DashboardCards from "@/components/DashboardCards";
 import UploadBox from "@/components/UploadBox";
 import FileInfo from "@/components/FileInfo";
+import ColumnMapper from "@/components/ColumnMapper";
 import KPISection from "@/components/KPISection";
 import RevenueChart from "@/components/RevenueChart";
 import LeadGrowthChart from "@/components/LeadGrowthChart";
@@ -26,6 +27,8 @@ export default function Home() {
             <UploadBox />
             <FileInfo />
           </div>
+
+          <ColumnMapper />
 
           <KPISection />
 

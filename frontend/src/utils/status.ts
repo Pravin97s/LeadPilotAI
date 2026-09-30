@@ -7,12 +7,19 @@ export interface StatusSummary {
 
 export function getStatusSummary(
   rows: CSVRow[],
-  column = "status"
+  column: string = "status"
 ): StatusSummary[] {
   const statusMap: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const status = String(row[column] ?? "Unknown");
+    const value = row[column];
+
+    const status =
+      value === null ||
+      value === undefined ||
+      String(value).trim() === ""
+        ? "Unknown"
+        : String(value);
 
     statusMap[status] =
       (statusMap[status] || 0) + 1;
@@ -28,14 +35,14 @@ export function getStatusSummary(
 
 export function totalStatus(
   rows: CSVRow[],
-  column = "status"
+  column: string = "status"
 ) {
   return getStatusSummary(rows, column).length;
 }
 
 export function topStatus(
   rows: CSVRow[],
-  column = "status"
+  column: string = "status"
 ) {
   const list = getStatusSummary(rows, column);
 
@@ -49,10 +56,12 @@ export function topStatus(
 
 export function statusChartData(
   rows: CSVRow[],
-  column = "status"
+  column: string = "status"
 ) {
-  return getStatusSummary(rows, column).map((item) => ({
-    name: item.status,
-    value: item.count,
-  }));
+  return getStatusSummary(rows, column).map(
+    (item) => ({
+      name: item.status,
+      value: item.count,
+    })
+  );
 }

@@ -9,7 +9,7 @@ export interface RevenueSummary {
 
 export function calculateRevenue(
   rows: CSVRow[],
-  column = "value"
+  column: string = "value"
 ): RevenueSummary {
   const values = rows
     .map((row) => Number(row[column] ?? 0))
@@ -41,17 +41,21 @@ export function calculateRevenue(
 
 export function monthlyRevenue(
   rows: CSVRow[],
-  dateColumn = "createdAt",
-  valueColumn = "value"
+  dateColumn: string = "createdAt",
+  valueColumn: string = "value"
 ) {
   const revenue: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const date = String(row[dateColumn] ?? "");
+    const rawDate = row[dateColumn];
 
-    if (!date) return;
+    if (!rawDate) return;
 
-    const month = new Date(date).toLocaleString("default", {
+    const parsed = new Date(String(rawDate));
+
+    if (isNaN(parsed.getTime())) return;
+
+    const month = parsed.toLocaleString("default", {
       month: "short",
     });
 
@@ -70,7 +74,7 @@ export function monthlyRevenue(
 
 export function totalRevenue(
   rows: CSVRow[],
-  column = "value"
+  column: string = "value"
 ) {
   return rows.reduce(
     (sum, row) =>

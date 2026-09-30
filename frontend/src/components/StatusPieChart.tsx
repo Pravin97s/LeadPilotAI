@@ -18,12 +18,24 @@ const COLORS = [
   "#ef4444",
   "#8b5cf6",
   "#06b6d4",
+  "#14b8a6",
+  "#f97316",
 ];
 
 export default function StatusPieChart() {
-  const { rows } = useDashboard();
+  const {
+    rows,
+    columnMapping,
+  } = useDashboard();
 
-  const data = statusChartData(rows);
+  const data = statusChartData(
+    rows,
+    columnMapping["Status"] || "status"
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
@@ -44,7 +56,11 @@ export default function StatusPieChart() {
               {data.map((_, index) => (
                 <Cell
                   key={index}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={
+                    COLORS[
+                      index % COLORS.length
+                    ]
+                  }
                 />
               ))}
             </Pie>

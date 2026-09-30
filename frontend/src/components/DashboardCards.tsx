@@ -20,19 +20,21 @@ export default function DashboardCards() {
       color: "bg-blue-600",
     },
     {
-      title: "Completion",
+      title: "Completion Rate",
       value: `${analytics.completionRate}%`,
       icon: CheckCircle2,
       color: "bg-green-600",
     },
     {
       title: "Revenue",
-      value: formatCurrency(analytics.totalRevenue),
+      value: formatCurrency(
+        analytics.totalRevenue
+      ),
       icon: IndianRupee,
       color: "bg-purple-600",
     },
     {
-      title: "Duplicates",
+      title: "Duplicate Rows",
       value: analytics.duplicateRows,
       icon: TrendingUp,
       color: "bg-orange-600",
@@ -40,18 +42,18 @@ export default function DashboardCards() {
   ];
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
 
         return (
           <div
             key={card.title}
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-6"
+            className="rounded-2xl border border-slate-800 bg-slate-900 p-6 transition hover:border-blue-600"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-400 text-sm">
+                <p className="text-sm text-slate-400">
                   {card.title}
                 </p>
 

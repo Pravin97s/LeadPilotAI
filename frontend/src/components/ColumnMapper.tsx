@@ -2,27 +2,24 @@
 
 import { useDashboard } from "@/providers/DashboardProvider";
 
-interface Props {
-  onContinue: () => void;
-}
-
 const requiredFields = [
-  "Name",
+  "Lead Name",
   "Email",
   "Phone",
   "Company",
-  "Revenue",
-  "Status",
+  "Source",
 ];
 
-export default function ColumnMapper({
-  onContinue,
-}: Props) {
+export default function ColumnMapper() {
   const {
     headers,
     columnMapping,
     setColumnMapping,
   } = useDashboard();
+
+  if (headers.length === 0) {
+    return null;
+  }
 
   function handleChange(
     field: string,
@@ -34,41 +31,40 @@ export default function ColumnMapper({
     });
   }
 
+  const completed =
+    Object.keys(columnMapping).length;
+
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="text-2xl font-bold">
-        Map CSV Columns
-      </h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          Column Mapping
+        </h2>
 
-      <p className="mt-2 text-slate-400">
-        Select which CSV column corresponds
-        to each field.
-      </p>
+        <span className="rounded-full bg-blue-600 px-3 py-1 text-sm">
+          {completed}/{requiredFields.length}
+        </span>
+      </div>
 
       <div className="mt-6 space-y-5">
         {requiredFields.map((field) => (
-          <div
-            key={field}
-            className="flex items-center justify-between gap-4"
-          >
-            <span className="font-medium w-36">
+          <div key={field}>
+            <label className="mb-2 block font-medium">
               {field}
-            </span>
+            </label>
 
             <select
-              value={
-                columnMapping[field] ?? ""
-              }
+              value={columnMapping[field] || ""}
               onChange={(e) =>
                 handleChange(
                   field,
                   e.target.value
                 )
               }
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
             >
               <option value="">
-                Select column
+                Select CSV Column
               </option>
 
               {headers.map((header) => (
@@ -85,8 +81,10 @@ export default function ColumnMapper({
       </div>
 
       <button
-        onClick={onContinue}
-        className="mt-8 rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-700"
+        disabled={
+          completed !== requiredFields.length
+        }
+        className="mt-8 w-full rounded-lg bg-blue-600 py-3 font-semibold disabled:cursor-not-allowed disabled:bg-slate-700"
       >
         Continue
       </button>

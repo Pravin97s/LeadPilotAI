@@ -13,9 +13,19 @@ import {
 } from "recharts";
 
 export default function ConversionChart() {
-  const { rows } = useDashboard();
+  const {
+    rows,
+    columnMapping,
+  } = useDashboard();
 
-  const data = statusChartData(rows);
+  const data = statusChartData(
+    rows,
+    columnMapping["Status"] || "status"
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">

@@ -1,75 +1,104 @@
 import { CSVRow } from "@/types/csv";
 
-export function generateStatusChart(rows: CSVRow[]) {
+export function generateStatusChart(
+  rows: CSVRow[],
+  column: string = "status"
+) {
   const counts: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const status = String(row.status ?? "Unknown");
+    const status = String(row[column] ?? "Unknown");
 
     counts[status] = (counts[status] || 0) + 1;
   });
 
-  return Object.entries(counts).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  return Object.entries(counts).map(
+    ([name, value]) => ({
+      name,
+      value,
+    })
+  );
 }
 
-export function generateSourceChart(rows: CSVRow[]) {
+export function generateSourceChart(
+  rows: CSVRow[],
+  column: string = "source"
+) {
   const counts: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const source = String(row.source ?? "Unknown");
+    const source = String(row[column] ?? "Unknown");
 
     counts[source] = (counts[source] || 0) + 1;
   });
 
-  return Object.entries(counts).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  return Object.entries(counts).map(
+    ([name, value]) => ({
+      name,
+      value,
+    })
+  );
 }
 
-export function generateMonthlyChart(rows: CSVRow[]) {
+export function generateMonthlyChart(
+  rows: CSVRow[],
+  dateColumn: string = "createdAt"
+) {
   const months: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const value = String(row.createdAt ?? "");
+    const rawDate = row[dateColumn];
 
-    if (!value) return;
+    if (!rawDate) return;
 
-    const month = new Date(value).toLocaleString("default", {
+    const parsed = new Date(String(rawDate));
+
+    if (isNaN(parsed.getTime())) return;
+
+    const month = parsed.toLocaleString("default", {
       month: "short",
     });
 
     months[month] = (months[month] || 0) + 1;
   });
 
-  return Object.entries(months).map(([month, leads]) => ({
-    month,
-    leads,
-  }));
+  return Object.entries(months).map(
+    ([month, leads]) => ({
+      month,
+      leads,
+    })
+  );
 }
 
-export function generateRevenueChart(rows: CSVRow[]) {
+export function generateRevenueChart(
+  rows: CSVRow[],
+  dateColumn: string = "createdAt",
+  valueColumn: string = "value"
+) {
   const revenue: Record<string, number> = {};
 
   rows.forEach((row) => {
-    const value = Number(row.value ?? 0);
+    const rawDate = row[dateColumn];
 
-    const date = String(row.createdAt ?? "");
+    if (!rawDate) return;
 
-    if (!date) return;
+    const parsed = new Date(String(rawDate));
 
-    const month = new Date(date).toLocaleString("default", {
+    if (isNaN(parsed.getTime())) return;
+
+    const month = parsed.toLocaleString("default", {
       month: "short",
     });
 
-    revenue[month] = (revenue[month] || 0) + value;
+    revenue[month] =
+      (revenue[month] || 0) +
+      Number(row[valueColumn] ?? 0);
   });
 
-  return Object.entries(revenue).map(([month, revenue]) => ({
-    month,
-    revenue,
-  }));
+  return Object.entries(revenue).map(
+    ([month, revenue]) => ({
+      month,
+      revenue,
+    })
+  );
 }

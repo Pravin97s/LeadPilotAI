@@ -13,9 +13,20 @@ import {
 } from "recharts";
 
 export default function RevenueChart() {
-  const { rows } = useDashboard();
+  const {
+    rows,
+    columnMapping,
+  } = useDashboard();
 
-  const data = monthlyRevenue(rows);
+  const data = monthlyRevenue(
+    rows,
+    columnMapping["Date"] || "createdAt",
+    columnMapping["Revenue"] || "value"
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
