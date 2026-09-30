@@ -1,4 +1,4 @@
-import { Lead } from "@/types/Lead";
+import { Lead } from "@/types/lead";
 
 export function getStatusChartData(leads: Lead[]) {
   const counts: Record<string, number> = {};

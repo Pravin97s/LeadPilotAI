@@ -27,31 +27,6 @@ export function validateRows(rows: CSVRow[]): boolean {
   return rows.length > 0;
 }
 
-export function removeEmptyRows(
-  rows: CSVRow[]
-): CSVRow[] {
-  return rows.filter((row) =>
-    Object.values(row).some(
-      (value) =>
-        value !== "" &&
-        value !== null &&
-        value !== undefined
-    )
-  );
-}
-
-export function removeDuplicateRows(
-  rows: CSVRow[]
-): CSVRow[] {
-  const unique = new Map<string, CSVRow>();
-
-  rows.forEach((row) => {
-    unique.set(JSON.stringify(row), row);
-  });
-
-  return [...unique.values()];
-}
-
 export function countMissingValues(
   rows: CSVRow[]
 ): number {
@@ -75,8 +50,11 @@ export function countMissingValues(
 export function countDuplicateRows(
   rows: CSVRow[]
 ): number {
-  return (
-    rows.length -
-    removeDuplicateRows(rows).length
-  );
+  const unique = new Map<string, CSVRow>();
+
+  rows.forEach((row) => {
+    unique.set(JSON.stringify(row), row);
+  });
+
+  return rows.length - unique.size;
 }

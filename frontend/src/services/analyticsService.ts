@@ -1,4 +1,4 @@
-import { Lead } from "@/types/Lead";
+import { Lead } from "@/types/lead";
 
 export function calculateAnalytics(leads: Lead[]) {
   const total = leads.length;

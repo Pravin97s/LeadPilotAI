@@ -29,7 +29,7 @@ export function clearData() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export function hasData() {
+export function hasStoredData() {
   if (typeof window === "undefined") return false;
 
   return localStorage.getItem(STORAGE_KEY) !== null;
