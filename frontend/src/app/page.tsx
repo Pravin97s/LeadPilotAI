@@ -14,6 +14,7 @@ import AllInsights from "@/components/AllInsights";
 import AIInsights from "@/components/AIInsights";
 import AILeadScore from "@/components/AILeadScore";
 import AIDataQuality from "@/components/AIDataQuality";
+import AISmartRecommendations from "@/components/AISmartRecommendations";
 
 export default function Home() {
   return (
@@ -72,6 +73,10 @@ export default function Home() {
 
           <section id="ai-data-quality">
             <AIDataQuality />
+          </section>
+
+          <section id="ai-smart-recommendations">
+            <AISmartRecommendations />
           </section>
 
           <section id="export">
