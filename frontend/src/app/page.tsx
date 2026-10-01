@@ -21,6 +21,7 @@ import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 import AIChatAssistant from "@/components/AIChatAssistant";
 import AIExportReport from "@/components/AIExportReport";
 import AILeadRanking from "@/components/AILeadRanking";
+import AIDashboardSettings from "@/components/AIDashboardSettings";
 
 export default function Home() {
   return (
@@ -107,6 +108,10 @@ export default function Home() {
 
           <section id="ai-lead-ranking">
   <AILeadRanking />
+</section>
+
+<section id="ai-dashboard-settings">
+  <AIDashboardSettings />
 </section>
 
         </div>
