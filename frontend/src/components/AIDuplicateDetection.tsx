@@ -10,7 +10,7 @@ type DuplicateItem = {
 };
 
 export default function AIDuplicateDetection() {
-  const { rows } = useDashboard();
+  const { rows, columnMapping } = useDashboard();
 
   const duplicateData = useMemo(() => {
     if (!rows.length) {
@@ -18,41 +18,41 @@ export default function AIDuplicateDetection() {
         duplicates: [],
         emailDuplicates: 0,
         phoneDuplicates: 0,
-        idDuplicates: 0,
+        companyDuplicates: 0,
+        nameDuplicates: 0,
+        totalDuplicates: 0,
         risk: 0,
       };
     }
 
-    const emailMap = new Map<string, number>();
-    const phoneMap = new Map<string, number>();
-    const idMap = new Map<string, number>();
+    const emailColumn = columnMapping["Email"];
+    const phoneColumn = columnMapping["Phone"];
+    const companyColumn = columnMapping["Company"];
+    const leadColumn = columnMapping["Lead Name"];
+
+    const maps = {
+      Email: new Map<string, number>(),
+      Phone: new Map<string, number>(),
+      Company: new Map<string, number>(),
+      Name: new Map<string, number>(),
+    };
 
     rows.forEach((row) => {
-      Object.entries(row).forEach(([key, value]) => {
-        const field = key.toLowerCase();
-        const text = String(value ?? "").trim();
+      [
+        ["Email", emailColumn],
+        ["Phone", phoneColumn],
+        ["Company", companyColumn],
+        ["Name", leadColumn],
+      ].forEach(([type, column]) => {
+        if (!column) return;
 
-        if (!text) return;
+        const value = String(row[column] ?? "").trim();
 
-        if (field.includes("email")) {
-          emailMap.set(text, (emailMap.get(text) || 0) + 1);
-        }
+        if (!value) return;
 
-        if (
-          field.includes("phone") ||
-          field.includes("mobile") ||
-          field.includes("contact")
-        ) {
-          phoneMap.set(text, (phoneMap.get(text) || 0) + 1);
-        }
+        const map = maps[type as keyof typeof maps];
 
-        if (
-          field === "id" ||
-          field.includes("customerid") ||
-          field.includes("leadid")
-        ) {
-          idMap.set(text, (idMap.get(text) || 0) + 1);
-        }
+        map.set(value, (map.get(value) || 0) + 1);
       });
     });
 
@@ -60,54 +60,47 @@ export default function AIDuplicateDetection() {
 
     let emailDuplicates = 0;
     let phoneDuplicates = 0;
-    let idDuplicates = 0;
+    let companyDuplicates = 0;
+    let nameDuplicates = 0;
 
-    emailMap.forEach((count, value) => {
-      if (count > 1) {
-        emailDuplicates++;
-        duplicates.push({
-          type: "Email",
-          value,
-          count,
-        });
-      }
+    Object.entries(maps).forEach(([type, map]) => {
+      map.forEach((count, value) => {
+        if (count > 1) {
+          duplicates.push({
+            type,
+            value,
+            count,
+          });
+
+          if (type === "Email") emailDuplicates++;
+
+          if (type === "Phone") phoneDuplicates++;
+
+          if (type === "Company") companyDuplicates++;
+
+          if (type === "Name") nameDuplicates++;
+        }
+      });
     });
 
-    phoneMap.forEach((count, value) => {
-      if (count > 1) {
-        phoneDuplicates++;
-        duplicates.push({
-          type: "Phone",
-          value,
-          count,
-        });
-      }
-    });
+    duplicates.sort((a, b) => b.count - a.count);
 
-    idMap.forEach((count, value) => {
-      if (count > 1) {
-        idDuplicates++;
-        duplicates.push({
-          type: "ID",
-          value,
-          count,
-        });
-      }
-    });
+    const totalDuplicates = duplicates.length;
 
-    const risk = (
-      (duplicates.length / rows.length) *
-      100
-    ).toFixed(1);
+    const risk = Number(
+      ((totalDuplicates / rows.length) * 100).toFixed(1)
+    );
 
     return {
       duplicates,
       emailDuplicates,
       phoneDuplicates,
-      idDuplicates,
+      companyDuplicates,
+      nameDuplicates,
+      totalDuplicates,
       risk,
     };
-  }, [rows]);
+  }, [rows, columnMapping]);
 
   if (!rows.length) {
     return (
@@ -129,7 +122,7 @@ export default function AIDuplicateDetection() {
         AI Duplicate Detection
       </h2>
 
-      <div className="mb-8 grid gap-6 md:grid-cols-4">
+      <div className="mb-8 grid gap-6 md:grid-cols-3 xl:grid-cols-6">
         <div className="rounded-xl bg-slate-800 p-5">
           <p className="text-slate-400">
             Duplicate Emails
@@ -152,11 +145,31 @@ export default function AIDuplicateDetection() {
 
         <div className="rounded-xl bg-slate-800 p-5">
           <p className="text-slate-400">
-            Duplicate IDs
+            Duplicate Companies
           </p>
 
           <h3 className="mt-3 text-3xl font-bold">
-            {duplicateData.idDuplicates}
+            {duplicateData.companyDuplicates}
+          </h3>
+        </div>
+
+        <div className="rounded-xl bg-slate-800 p-5">
+          <p className="text-slate-400">
+            Duplicate Names
+          </p>
+
+          <h3 className="mt-3 text-3xl font-bold">
+            {duplicateData.nameDuplicates}
+          </h3>
+        </div>
+
+        <div className="rounded-xl bg-slate-800 p-5">
+          <p className="text-slate-400">
+            Total Duplicates
+          </p>
+
+          <h3 className="mt-3 text-3xl font-bold text-yellow-400">
+            {duplicateData.totalDuplicates}
           </h3>
         </div>
 
@@ -165,7 +178,7 @@ export default function AIDuplicateDetection() {
             Duplicate Risk
           </p>
 
-          <h3 className="mt-3 text-3xl font-bold">
+          <h3 className="mt-3 text-3xl font-bold text-red-400">
             {duplicateData.risk}%
           </h3>
         </div>
@@ -173,7 +186,7 @@ export default function AIDuplicateDetection() {
 
       {duplicateData.duplicates.length === 0 ? (
         <div className="rounded-xl border border-green-600 bg-green-900/20 p-6 text-green-400">
-          ✅ No duplicate Emails, Phones or IDs detected.
+          ✅ No duplicate records detected.
         </div>
       ) : (
         <div className="overflow-auto rounded-xl border border-slate-800">
@@ -188,7 +201,7 @@ export default function AIDuplicateDetection() {
                   Duplicate Value
                 </th>
 
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-center">
                   Count
                 </th>
               </tr>
@@ -201,15 +214,15 @@ export default function AIDuplicateDetection() {
                     key={index}
                     className="border-t border-slate-800 hover:bg-slate-800/40"
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-medium">
                       {item.type}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 break-all">
                       {item.value}
                     </td>
 
-                    <td className="px-4 py-3 font-bold text-red-400">
+                    <td className="px-4 py-3 text-center font-bold text-red-400">
                       {item.count}
                     </td>
                   </tr>

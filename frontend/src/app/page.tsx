@@ -13,6 +13,7 @@ import LeadsTable from "@/components/LeadsTable";
 import AllInsights from "@/components/AllInsights";
 import AIInsights from "@/components/AIInsights";
 import AILeadScore from "@/components/AILeadScore";
+import AILeadRanking from "@/components/AILeadRanking";
 import AIDataQuality from "@/components/AIDataQuality";
 import AISmartRecommendations from "@/components/AISmartRecommendations";
 import AICSVSummary from "@/components/AICSVSummary";
@@ -20,9 +21,7 @@ import AIDuplicateDetection from "@/components/AIDuplicateDetection";
 import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 import AIChatAssistant from "@/components/AIChatAssistant";
 import AIExportReport from "@/components/AIExportReport";
-import AILeadRanking from "@/components/AILeadRanking";
 import AIDashboardSettings from "@/components/AIDashboardSettings";
-import AILeadRanking from "@/components/AILeadRanking";
 
 export default function Home() {
   return (
@@ -33,7 +32,6 @@ export default function Home() {
         <Navbar />
 
         <div className="space-y-8 p-8">
-
           <section id="dashboard">
             <DashboardCards />
           </section>
@@ -80,8 +78,8 @@ export default function Home() {
           </section>
 
           <section id="ai-lead-ranking">
-    <AILeadRanking />
-</section>
+            <AILeadRanking />
+          </section>
 
           <section id="ai-data-quality">
             <AIDataQuality />
@@ -100,25 +98,20 @@ export default function Home() {
           </section>
 
           <section id="ai-predictive-analytics">
-  <AIPredictiveAnalytics />
-</section>
+            <AIPredictiveAnalytics />
+          </section>
 
-<section id="ai-chat-assistant">
-  <AIChatAssistant />
-</section>
+          <section id="ai-chat-assistant">
+            <AIChatAssistant />
+          </section>
 
           <section id="export">
             <AIExportReport />
           </section>
 
-          <section id="ai-lead-ranking">
-  <AILeadRanking />
-</section>
-
-<section id="ai-dashboard-settings">
-  <AIDashboardSettings />
-</section>
-
+          <section id="ai-dashboard-settings">
+            <AIDashboardSettings />
+          </section>
         </div>
       </section>
     </main>
