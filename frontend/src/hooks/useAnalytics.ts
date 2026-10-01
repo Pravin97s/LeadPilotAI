@@ -2,16 +2,16 @@
 
 import { useMemo } from "react";
 import { useDashboard } from "@/providers/DashboardProvider";
+import useFilteredRows from "@/hooks/useFilteredRows";
 import { generateDashboard } from "@/utils/dashboard";
 import { calculateRevenue } from "@/utils/revenue";
 import { getStatusSummary } from "@/utils/status";
 import { getSourceSummary } from "@/utils/source";
 
 export default function useAnalytics() {
-  const {
-    rows,
-    columnMapping,
-  } = useDashboard();
+  const { columnMapping } = useDashboard();
+
+  const rows = useFilteredRows();
 
   const analytics = useMemo(() => {
     const dashboard = generateDashboard(rows);
