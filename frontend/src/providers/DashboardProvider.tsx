@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
   ReactNode,
+  useEffect,
 } from "react";
 import { CSVRow } from "@/types/csv";
 
@@ -23,6 +24,15 @@ export interface DashboardContextType {
   setColumnMapping: (
     mapping: Record<string, string>
   ) => void;
+
+  compactView: boolean;
+  setCompactView: (value: boolean) => void;
+
+  autoAnalyze: boolean;
+  setAutoAnalyze: (value: boolean) => void;
+
+  refreshDashboard: () => void;
+  resetDashboard: () => void;
 }
 
 const DashboardContext =
@@ -47,6 +57,88 @@ export function DashboardProvider({
   const [columnMapping, setColumnMapping] =
     useState<Record<string, string>>({});
 
+  const [compactView, setCompactView] =
+    useState(false);
+
+  const [autoAnalyze, setAutoAnalyze] =
+    useState(true);
+
+  useEffect(() => {
+    const compact =
+      localStorage.getItem("compactView");
+
+    const auto =
+      localStorage.getItem("autoAnalyze");
+
+    if (compact !== null) {
+      setCompactView(compact === "true");
+    }
+
+    if (auto !== null) {
+      setAutoAnalyze(auto === "true");
+    }
+  }, []);
+
+  function refreshDashboard() {
+    setRows((prev) => [...prev]);
+  }
+
+  function resetDashboard() {
+    setRows([]);
+    setSelectedFile("");
+    setHeaders([]);
+    setColumnMapping({});
+  }
+
+  useEffect(() => {
+    const refresh = () =>
+      refreshDashboard();
+
+    const reset = () =>
+      resetDashboard();
+
+    const compactHandler = (
+      event: Event
+    ) => {
+      const custom =
+        event as CustomEvent<boolean>;
+
+      setCompactView(custom.detail);
+    };
+
+    window.addEventListener(
+      "refresh-dashboard",
+      refresh
+    );
+
+    window.addEventListener(
+      "reset-dashboard",
+      reset
+    );
+
+    window.addEventListener(
+      "compact-view",
+      compactHandler as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "refresh-dashboard",
+        refresh
+      );
+
+      window.removeEventListener(
+        "reset-dashboard",
+        reset
+      );
+
+      window.removeEventListener(
+        "compact-view",
+        compactHandler as EventListener
+      );
+    };
+  }, []);
+
   const value = useMemo(
     () => ({
       rows,
@@ -60,17 +152,30 @@ export function DashboardProvider({
 
       columnMapping,
       setColumnMapping,
+
+      compactView,
+      setCompactView,
+
+      autoAnalyze,
+      setAutoAnalyze,
+
+      refreshDashboard,
+      resetDashboard,
     }),
     [
       rows,
       selectedFile,
       headers,
       columnMapping,
+      compactView,
+      autoAnalyze,
     ]
   );
 
   return (
-    <DashboardContext.Provider value={value}>
+    <DashboardContext.Provider
+      value={value}
+    >
       {children}
     </DashboardContext.Provider>
   );
