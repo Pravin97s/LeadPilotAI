@@ -11,6 +11,7 @@ import ConversionChart from "@/components/ConversionChart";
 import StatusPieChart from "@/components/StatusPieChart";
 import LeadsTable from "@/components/LeadsTable";
 import AllInsights from "@/components/AllInsights";
+import AIInsights from "@/components/AIInsights";
 
 export default function Home() {
   return (
@@ -20,7 +21,8 @@ export default function Home() {
       <section className="flex-1 overflow-y-auto">
         <Navbar />
 
-        <div className="p-8 space-y-8">
+        <div className="space-y-8 p-8">
+
           <section id="dashboard">
             <DashboardCards />
           </section>
@@ -58,8 +60,13 @@ export default function Home() {
             <AllInsights />
           </section>
 
+          <section id="ai-insights">
+            <AIInsights />
+          </section>
+
           <section id="export">
           </section>
+
         </div>
       </section>
     </main>
