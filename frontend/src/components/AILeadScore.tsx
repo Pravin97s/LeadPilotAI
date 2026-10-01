@@ -1,26 +1,13 @@
 "use client";
 
-import useDashboard from "@/hooks/useDashboard";
+import { useMemo } from "react";
+import useFilteredRows from "@/hooks/useFilteredRows";
 
 export default function AILeadScore() {
-  const { rows } = useDashboard();
-
-  if (rows.length === 0) {
-    return (
-      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <h2 className="text-2xl font-bold mb-4">
-          AI Lead Scoring
-        </h2>
-
-        <p className="text-slate-400">
-          Upload a CSV file to generate AI lead scores.
-        </p>
-      </section>
-    );
-  }
+  const rows = useFilteredRows();
 
   const getValue = (
-    row: any,
+    row: Record<string, any>,
     keys: string[]
   ) => {
     for (const key of keys) {
@@ -36,75 +23,112 @@ export default function AILeadScore() {
     return "";
   };
 
-  const scoredRows = rows.map((row) => {
-    const revenue = Number(
-      getValue(row, [
-        "Revenue",
-        "revenue",
-        "Amount",
-        "amount",
-        "Sales",
-      ])
+  const topLeads = useMemo(() => {
+    if (!rows.length) return [];
+
+    return rows
+      .map((row) => {
+        const revenue = Number(
+          String(
+            getValue(row, [
+              "Revenue",
+              "revenue",
+              "Amount",
+              "amount",
+              "Sales",
+              "Value",
+            ])
+          ).replace(/[^\d.-]/g, "")
+        );
+
+        const status = String(
+          getValue(row, [
+            "Status",
+            "status",
+          ])
+        ).toLowerCase();
+
+        const source = String(
+          getValue(row, [
+            "Source",
+            "source",
+          ])
+        ).toLowerCase();
+
+        let score = 20;
+
+        if (revenue >= 200000) score += 40;
+        else if (revenue >= 150000) score += 35;
+        else if (revenue >= 100000) score += 25;
+        else if (revenue >= 50000) score += 15;
+        else if (revenue > 0) score += 8;
+
+        if (
+          status.includes("won") ||
+          status.includes("closed")
+        ) {
+          score += 25;
+        } else if (
+          status.includes("qualified")
+        ) {
+          score += 18;
+        } else if (
+          status.includes("pending")
+        ) {
+          score += 10;
+        }
+
+        if (
+          source.includes("linkedin")
+        ) {
+          score += 15;
+        } else if (
+          source.includes("facebook")
+        ) {
+          score += 10;
+        } else if (
+          source.includes("instagram")
+        ) {
+          score += 8;
+        } else if (
+          source.includes("website")
+        ) {
+          score += 6;
+        }
+
+        score = Math.min(score, 100);
+
+        return {
+          row,
+          score,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  }, [rows]);
+
+  if (!rows.length) {
+    return (
+      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="mb-4 text-2xl font-bold">
+          AI Lead Scoring
+        </h2>
+
+        <p className="text-slate-400">
+          Upload a CSV file to generate AI lead scores.
+        </p>
+      </section>
     );
-
-    const status = String(
-      getValue(row, [
-        "Status",
-        "status",
-      ])
-    ).toLowerCase();
-
-    const source = String(
-      getValue(row, [
-        "Source",
-        "source",
-      ])
-    ).toLowerCase();
-
-    let score = 20;
-
-    if (revenue > 180000) score += 40;
-    else if (revenue > 120000) score += 30;
-    else if (revenue > 70000) score += 20;
-    else if (revenue > 30000) score += 10;
-
-    if (status.includes("won"))
-      score += 25;
-    else if (status.includes("pending"))
-      score += 12;
-    else if (status.includes("lost"))
-      score += 0;
-
-    if (source.includes("linkedin"))
-      score += 15;
-    else if (source.includes("facebook"))
-      score += 10;
-    else if (source.includes("instagram"))
-      score += 8;
-
-    score = Math.min(score, 100);
-
-    return {
-      row,
-      score,
-    };
-  });
-
-  const topLeads = [...scoredRows]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
+  }
 
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-
-      <h2 className="text-2xl font-bold mb-6">
+      <h2 className="mb-6 text-2xl font-bold">
         AI Lead Scoring
       </h2>
 
       <div className="overflow-auto rounded-xl border border-slate-800">
-
         <table className="min-w-full">
-
           <thead className="bg-slate-800">
             <tr>
               <th className="px-4 py-3 text-left">
@@ -124,120 +148,117 @@ export default function AILeadScore() {
               </th>
 
               <th className="px-4 py-3 text-left">
-                AI Rating
+                AI Score
               </th>
             </tr>
           </thead>
 
           <tbody>
+            {topLeads.map(
+              ({ row, score }, index) => {
+                const name = getValue(row, [
+                  "Name",
+                  "Lead Name",
+                  "Customer",
+                  "Client",
+                  "Full Name",
+                ]);
 
-            {topLeads.map(({ row, score }, index) => {
+                const revenue =
+                  getValue(row, [
+                    "Revenue",
+                    "Amount",
+                  ]);
 
-              const name = getValue(row, [
-                "Name",
-                "name",
-                "Customer",
-                "customer",
-                "Customer Name",
-                "Lead Name",
-                "Client",
-                "Full Name",
-              ]);
+                const status =
+                  getValue(row, [
+                    "Status",
+                  ]);
 
-              const revenue = getValue(row, [
-                "Revenue",
-                "revenue",
-                "Amount",
-              ]);
+                const source =
+                  getValue(row, [
+                    "Source",
+                  ]);
 
-              const status = getValue(row, [
-                "Status",
-                "status",
-              ]);
+                let badge = "Low";
+                let color =
+                  "bg-orange-500";
 
-              const source = getValue(row, [
-                "Source",
-                "source",
-              ]);
+                if (score >= 90) {
+                  badge = "Excellent";
+                  color =
+                    "bg-green-500";
+                } else if (
+                  score >= 75
+                ) {
+                  badge = "High";
+                  color =
+                    "bg-emerald-500";
+                } else if (
+                  score >= 60
+                ) {
+                  badge = "Medium";
+                  color =
+                    "bg-yellow-500";
+                } else if (
+                  score >= 40
+                ) {
+                  badge = "Fair";
+                  color =
+                    "bg-blue-500";
+                }
 
-              let badge = "Poor";
-              let color = "bg-red-500";
+                return (
+                  <tr
+                    key={index}
+                    className="border-t border-slate-800"
+                  >
+                    <td className="px-4 py-3 font-medium">
+                      {name ||
+                        "Unknown Lead"}
+                    </td>
 
-              if (score >= 90) {
-                badge = "Excellent";
-                color = "bg-green-500";
-              } else if (score >= 75) {
-                badge = "High";
-                color = "bg-emerald-500";
-              } else if (score >= 60) {
-                badge = "Medium";
-                color = "bg-yellow-500";
-              } else if (score >= 40) {
-                badge = "Low";
-                color = "bg-orange-500";
-              }
+                    <td className="px-4 py-3">
+                      {source}
+                    </td>
 
-              return (
-                <tr
-                  key={index}
-                  className="border-t border-slate-800"
-                >
+                    <td className="px-4 py-3">
+                      ₹{revenue}
+                    </td>
 
-                  <td className="px-4 py-3 font-medium">
-                    {name || "Unknown Lead"}
-                  </td>
+                    <td className="px-4 py-3">
+                      {status}
+                    </td>
 
-                  <td className="px-4 py-3">
-                    {source}
-                  </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-36 rounded-full bg-slate-700">
+                          <div
+                            className={`${color} h-2 rounded-full`}
+                            style={{
+                              width: `${score}%`,
+                            }}
+                          />
+                        </div>
 
-                  <td className="px-4 py-3">
-                    ₹{revenue}
-                  </td>
+                        <span className="w-10 font-bold">
+                          {score}
+                        </span>
 
-                  <td className="px-4 py-3">
-                    {status}
-                  </td>
-
-                  <td className="px-4 py-3">
-
-                    <div className="flex items-center gap-3">
-
-                      <div className="w-36 h-2 rounded-full bg-slate-700">
-
-                        <div
-                          className={`${color} h-2 rounded-full`}
-                          style={{
-                            width: `${score}%`,
-                          }}
-                        />
-
+                        <span
+                          className={`${color} rounded-full px-3 py-1 text-xs font-semibold`}
+                        >
+                          {badge}
+                        </span>
                       </div>
-
-                      <span className="font-semibold">
-                        {score}
-                      </span>
-
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs ${color}`}
-                      >
-                        {badge}
-                      </span>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-              );
-            })}
-
+                    </td>
+                  </tr>
+                );
+              }
+            )}
           </tbody>
-
         </table>
-
       </div>
-
     </section>
   );
 }
