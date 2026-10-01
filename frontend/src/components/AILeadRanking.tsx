@@ -1,129 +1,139 @@
 "use client";
 
 import { useMemo } from "react";
+import { Trophy } from "lucide-react";
 import useDashboard from "@/hooks/useDashboard";
 
-type RankedLead = {
-  index: number;
-  score: number;
-  row: Record<string, any>;
-};
-
 export default function AILeadRanking() {
-  const { rows } = useDashboard();
+  const {
+    rows,
+    columnMapping,
+  } = useDashboard();
 
-  const ranked = useMemo(() => {
-    if (!rows.length) return [];
+  const rankedLeads = useMemo(() => {
+    const revenueColumn =
+      columnMapping["Revenue"];
+
+    const statusColumn =
+      columnMapping["Status"];
+
+    const sourceColumn =
+      columnMapping["Source"];
+
+    const leadColumn =
+      columnMapping["Lead Name"];
+
+    if (!leadColumn) return [];
 
     return rows
-      .map((row, index) => {
-        let score = 50;
+      .map((row) => {
+        let score = 0;
 
-        Object.values(row).forEach((value) => {
-          const text = String(value).toLowerCase();
+        const revenue = Number(
+          row[revenueColumn] ?? 0
+        );
 
-          if (
-            text.includes("won") ||
-            text.includes("closed") ||
-            text.includes("paid")
-          )
-            score += 20;
+        if (revenue > 100000) score += 40;
+        else if (revenue > 50000) score += 30;
+        else if (revenue > 10000) score += 20;
+        else score += 10;
 
-          if (
-            text.includes("linkedin") ||
-            text.includes("website")
-          )
-            score += 15;
+        const status = String(
+          row[statusColumn] ?? ""
+        ).toLowerCase();
 
-          if (
-            text.includes("facebook") ||
-            text.includes("instagram")
-          )
-            score += 8;
+        if (
+          status.includes("won") ||
+          status.includes("converted")
+        )
+          score += 30;
 
-          if (
-            text.includes("cold") ||
-            text.includes("lost")
-          )
-            score -= 15;
-        });
+        if (
+          status.includes("qualified")
+        )
+          score += 20;
 
-        score = Math.max(0, Math.min(100, score));
+        const source = String(
+          row[sourceColumn] ?? ""
+        ).toLowerCase();
+
+        if (
+          source.includes("linkedin")
+        )
+          score += 15;
+
+        if (
+          source.includes("facebook")
+        )
+          score += 12;
+
+        if (
+          source.includes("google")
+        )
+          score += 10;
 
         return {
-          index,
+          name: String(
+            row[leadColumn] ?? "Unknown"
+          ),
+          revenue,
           score,
-          row,
+          status,
+          source,
         };
       })
-      .sort((a, b) => b.score - a.score)
+      .sort(
+        (a, b) => b.score - a.score
+      )
       .slice(0, 10);
-  }, [rows]);
-
-  if (!rows.length) {
-    return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        Upload a CSV to rank leads.
-      </div>
-    );
-  }
-
-  const headers = Object.keys(rows[0]).slice(0, 3);
+  }, [rows, columnMapping]);
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="text-3xl font-bold mb-6">
-        AI Lead Ranking
-      </h2>
-
-      <div className="overflow-auto rounded-xl border border-slate-800">
-        <table className="min-w-full">
-          <thead className="bg-slate-800">
-            <tr>
-              <th className="px-4 py-3">Rank</th>
-              {headers.map((h) => (
-                <th key={h} className="px-4 py-3">
-                  {h}
-                </th>
-              ))}
-              <th className="px-4 py-3">
-                AI Score
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {ranked.map((lead, i) => (
-              <tr
-                key={i}
-                className="border-t border-slate-800 hover:bg-slate-800/40"
-              >
-                <td className="px-4 py-3 font-bold">
-                  #{i + 1}
-                </td>
-
-                {headers.map((h) => (
-                  <td key={h} className="px-4 py-3">
-                    {String(lead.row[h])}
-                  </td>
-                ))}
-
-                <td
-                  className={`px-4 py-3 font-bold ${
-                    lead.score >= 80
-                      ? "text-green-400"
-                      : lead.score >= 60
-                      ? "text-yellow-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  {lead.score}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <div className="mb-6 flex items-center gap-3">
+        <Trophy className="text-yellow-400" />
+        <h2 className="text-2xl font-bold">
+          AI Lead Ranking
+        </h2>
       </div>
-    </section>
+
+      {rankedLeads.length === 0 ? (
+        <p className="text-slate-400">
+          Upload a CSV to view lead rankings.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {rankedLeads.map(
+            (lead, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between rounded-xl bg-slate-800 p-4"
+              >
+                <div>
+                  <h3 className="font-semibold">
+                    {lead.name}
+                  </h3>
+
+                  <p className="text-sm text-slate-400">
+                    {lead.status}
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <p className="font-bold text-green-400">
+                    {lead.score}/100
+                  </p>
+
+                  <p className="text-xs text-slate-400">
+                    ₹
+                    {lead.revenue.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
+    </div>
   );
 }

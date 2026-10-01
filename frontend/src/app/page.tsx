@@ -22,6 +22,7 @@ import AIChatAssistant from "@/components/AIChatAssistant";
 import AIExportReport from "@/components/AIExportReport";
 import AILeadRanking from "@/components/AILeadRanking";
 import AIDashboardSettings from "@/components/AIDashboardSettings";
+import AILeadRanking from "@/components/AILeadRanking";
 
 export default function Home() {
   return (
@@ -77,6 +78,10 @@ export default function Home() {
           <section id="ai-lead-score">
             <AILeadScore />
           </section>
+
+          <section id="ai-lead-ranking">
+    <AILeadRanking />
+</section>
 
           <section id="ai-data-quality">
             <AIDataQuality />
