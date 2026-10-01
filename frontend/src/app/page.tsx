@@ -15,6 +15,7 @@ import AIInsights from "@/components/AIInsights";
 import AILeadScore from "@/components/AILeadScore";
 import AIDataQuality from "@/components/AIDataQuality";
 import AISmartRecommendations from "@/components/AISmartRecommendations";
+import AICSVSummary from "@/components/AICSVSummary";
 
 export default function Home() {
   return (
@@ -77,6 +78,10 @@ export default function Home() {
 
           <section id="ai-smart-recommendations">
             <AISmartRecommendations />
+          </section>
+
+          <section id="ai-csv-summary">
+            <AICSVSummary />
           </section>
 
           <section id="export">
