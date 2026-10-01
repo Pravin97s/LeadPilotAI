@@ -6,29 +6,16 @@ import useDashboard from "@/hooks/useDashboard";
 export default function AIPredictiveAnalytics() {
   const { rows, columnMapping } = useDashboard();
 
-  const prediction = useMemo(() => {
+  const analytics = useMemo(() => {
     if (!rows.length) {
-      return {
-        revenue: 0,
-        leads: 0,
-        growth: 0,
-        conversion: 0,
-        bestSource: "-",
-        hotLeads: 0,
-        coldLeads: 0,
-        confidence: 0,
-      };
+      return null;
     }
 
     const revenueColumn = columnMapping["Revenue"];
     const statusColumn = columnMapping["Status"];
-    const sourceColumn = columnMapping["Source"];
 
     let totalRevenue = 0;
-    let converted = 0;
-    let hotLeads = 0;
-
-    const sourceCount: Record<string, number> = {};
+    let won = 0;
 
     rows.forEach((row) => {
       if (revenueColumn) {
@@ -38,10 +25,6 @@ export default function AIPredictiveAnalytics() {
 
         if (!isNaN(revenue)) {
           totalRevenue += revenue;
-
-          if (revenue >= 50000) {
-            hotLeads++;
-          }
         }
       }
 
@@ -55,65 +38,94 @@ export default function AIPredictiveAnalytics() {
           status.includes("converted") ||
           status.includes("closed")
         ) {
-          converted++;
+          won++;
         }
-      }
-
-      if (sourceColumn) {
-        const source = String(
-          row[sourceColumn] ?? "Unknown"
-        );
-
-        sourceCount[source] =
-          (sourceCount[source] || 0) + 1;
       }
     });
 
-    const bestSource =
-      Object.entries(sourceCount).sort(
-        (a, b) => b[1] - a[1]
-      )[0]?.[0] ?? "-";
+    const totalLeads = rows.length;
 
-    const conversion = Number(
-      ((converted / rows.length) * 100).toFixed(1)
+    const avgRevenue =
+      totalLeads === 0
+        ? 0
+        : totalRevenue / totalLeads;
+
+    const conversionRate =
+      totalLeads === 0
+        ? 0
+        : (won / totalLeads) * 100;
+
+    const predictedLeads = Math.round(
+      totalLeads * 1.15
     );
 
     const predictedRevenue = Math.round(
-      totalRevenue * 1.12
+      predictedLeads * avgRevenue
     );
 
-    const predictedLeads = Math.round(
-      rows.length * 1.08
-    );
-
-    const growth = Number(
-      (
-        ((predictedRevenue - totalRevenue) /
-          Math.max(totalRevenue, 1)) *
+    const growth = Math.round(
+      ((predictedRevenue - totalRevenue) /
+        Math.max(totalRevenue, 1)) *
         100
-      ).toFixed(1)
     );
 
-    const confidence = Math.min(
-      99,
-      Math.round(
-        60 +
-          (rows.length / 100) * 20 +
-          conversion / 5
-      )
-    );
+    const confidence =
+      conversionRate >= 70
+        ? 94
+        : conversionRate >= 50
+        ? 88
+        : conversionRate >= 30
+        ? 80
+        : 72;
+
+    let trend = "Stable";
+
+    if (growth > 10) {
+      trend = "Growing";
+    } else if (growth < 0) {
+      trend = "Declining";
+    }
+
+    let recommendation =
+      "Continue current marketing strategy.";
+
+    if (conversionRate < 30) {
+      recommendation =
+        "Improve lead qualification to increase conversions.";
+    } else if (avgRevenue < 5000) {
+      recommendation =
+        "Focus on acquiring higher-value customers.";
+    } else if (growth > 20) {
+      recommendation =
+        "Increase marketing budget to sustain growth.";
+    }
 
     return {
-      revenue: predictedRevenue,
-      leads: predictedLeads,
-      growth,
-      conversion,
-      bestSource,
-      hotLeads,
-      coldLeads: rows.length - hotLeads,
+      totalRevenue,
+      predictedRevenue,
+      predictedLeads,
+      avgRevenue,
+      conversionRate,
       confidence,
+      growth,
+      trend,
+      recommendation,
     };
   }, [rows, columnMapping]);
+
+  if (!analytics) {
+    return (
+      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="mb-4 text-3xl font-bold">
+          AI Predictive Analytics
+        </h2>
+
+        <p className="text-slate-400">
+          Upload a CSV file to generate AI predictions.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
@@ -121,34 +133,37 @@ export default function AIPredictiveAnalytics() {
         AI Predictive Analytics
       </h2>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
         <div className="rounded-xl bg-slate-800 p-5">
           <p className="text-slate-400">
             Predicted Revenue
           </p>
 
           <h3 className="mt-3 text-3xl font-bold text-green-400">
-            ₹{prediction.revenue.toLocaleString()}
+            ₹{analytics.predictedRevenue.toLocaleString()}
           </h3>
         </div>
 
         <div className="rounded-xl bg-slate-800 p-5">
           <p className="text-slate-400">
-            Expected Leads
+            Predicted Leads
           </p>
 
           <h3 className="mt-3 text-3xl font-bold text-blue-400">
-            {prediction.leads}
+            {analytics.predictedLeads}
           </h3>
         </div>
 
         <div className="rounded-xl bg-slate-800 p-5">
           <p className="text-slate-400">
-            Growth Forecast
+            Revenue / Lead
           </p>
 
-          <h3 className="mt-3 text-3xl font-bold text-yellow-400">
-            {prediction.growth}%
+          <h3 className="mt-3 text-3xl font-bold text-purple-400">
+            ₹{Math.round(
+              analytics.avgRevenue
+            ).toLocaleString()}
           </h3>
         </div>
 
@@ -157,38 +172,8 @@ export default function AIPredictiveAnalytics() {
             Conversion Rate
           </p>
 
-          <h3 className="mt-3 text-3xl font-bold text-purple-400">
-            {prediction.conversion}%
-          </h3>
-        </div>
-
-        <div className="rounded-xl bg-slate-800 p-5">
-          <p className="text-slate-400">
-            Best Lead Source
-          </p>
-
-          <h3 className="mt-3 text-xl font-bold text-cyan-400">
-            {prediction.bestSource}
-          </h3>
-        </div>
-
-        <div className="rounded-xl bg-slate-800 p-5">
-          <p className="text-slate-400">
-            Hot Leads
-          </p>
-
-          <h3 className="mt-3 text-3xl font-bold text-red-400">
-            {prediction.hotLeads}
-          </h3>
-        </div>
-
-        <div className="rounded-xl bg-slate-800 p-5">
-          <p className="text-slate-400">
-            Cold Leads
-          </p>
-
-          <h3 className="mt-3 text-3xl font-bold text-orange-400">
-            {prediction.coldLeads}
+          <h3 className="mt-3 text-3xl font-bold text-yellow-400">
+            {analytics.conversionRate.toFixed(1)}%
           </h3>
         </div>
 
@@ -197,10 +182,50 @@ export default function AIPredictiveAnalytics() {
             AI Confidence
           </p>
 
-          <h3 className="mt-3 text-3xl font-bold text-emerald-400">
-            {prediction.confidence}%
+          <h3 className="mt-3 text-3xl font-bold text-cyan-400">
+            {analytics.confidence}%
           </h3>
         </div>
+
+        <div className="rounded-xl bg-slate-800 p-5">
+          <p className="text-slate-400">
+            Growth Forecast
+          </p>
+
+          <h3
+            className={`mt-3 text-3xl font-bold ${
+              analytics.growth >= 0
+                ? "text-green-400"
+                : "text-red-400"
+            }`}
+          >
+            {analytics.growth}%
+          </h3>
+        </div>
+
+      </div>
+
+      <div className="mt-8 rounded-xl bg-slate-800 p-6">
+
+        <h3 className="text-xl font-semibold">
+          AI Business Forecast
+        </h3>
+
+        <p className="mt-4 text-slate-300">
+          Trend:
+          <span className="ml-2 font-bold text-blue-400">
+            {analytics.trend}
+          </span>
+        </p>
+
+        <p className="mt-3 text-slate-300">
+          Recommendation:
+        </p>
+
+        <p className="mt-2 rounded-lg bg-slate-700 p-4">
+          {analytics.recommendation}
+        </p>
+
       </div>
     </section>
   );

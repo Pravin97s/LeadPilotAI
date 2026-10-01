@@ -48,7 +48,14 @@ export default function AIDuplicateDetection() {
 
         const value = String(row[column] ?? "").trim();
 
-        if (!value) return;
+        if (
+          !value ||
+          value.toLowerCase() === "unknown" ||
+          value.toLowerCase() === "n/a" ||
+          value.toLowerCase() === "null"
+        ) {
+          return;
+        }
 
         const map = maps[type as keyof typeof maps];
 
@@ -72,18 +79,34 @@ export default function AIDuplicateDetection() {
             count,
           });
 
-          if (type === "Email") emailDuplicates++;
+          switch (type) {
+            case "Email":
+              emailDuplicates++;
+              break;
 
-          if (type === "Phone") phoneDuplicates++;
+            case "Phone":
+              phoneDuplicates++;
+              break;
 
-          if (type === "Company") companyDuplicates++;
+            case "Company":
+              companyDuplicates++;
+              break;
 
-          if (type === "Name") nameDuplicates++;
+            case "Name":
+              nameDuplicates++;
+              break;
+          }
         }
       });
     });
 
-    duplicates.sort((a, b) => b.count - a.count);
+    duplicates.sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+
+      return a.type.localeCompare(b.type);
+    });
 
     const totalDuplicates = duplicates.length;
 
@@ -118,9 +141,23 @@ export default function AIDuplicateDetection() {
 
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="mb-6 text-3xl font-bold">
-        AI Duplicate Detection
-      </h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-3xl font-bold">
+          AI Duplicate Detection
+        </h2>
+
+        <span
+          className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            duplicateData.risk >= 20
+              ? "bg-red-600"
+              : duplicateData.risk >= 10
+              ? "bg-yellow-600"
+              : "bg-green-600"
+          }`}
+        >
+          Risk {duplicateData.risk}%
+        </span>
+      </div>
 
       <div className="mb-8 grid gap-6 md:grid-cols-3 xl:grid-cols-6">
         <div className="rounded-xl bg-slate-800 p-5">
@@ -185,7 +222,7 @@ export default function AIDuplicateDetection() {
       </div>
 
       {duplicateData.duplicates.length === 0 ? (
-        <div className="rounded-xl border border-green-600 bg-green-900/20 p-6 text-green-400">
+        <div className="rounded-xl border border-green-600 bg-green-900/20 p-6 text-center text-green-400">
           ✅ No duplicate records detected.
         </div>
       ) : (
@@ -214,16 +251,30 @@ export default function AIDuplicateDetection() {
                     key={index}
                     className="border-t border-slate-800 hover:bg-slate-800/40"
                   >
-                    <td className="px-4 py-3 font-medium">
-                      {item.type}
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          item.type === "Email"
+                            ? "bg-blue-600"
+                            : item.type === "Phone"
+                            ? "bg-green-600"
+                            : item.type === "Company"
+                            ? "bg-purple-600"
+                            : "bg-orange-600"
+                        }`}
+                      >
+                        {item.type}
+                      </span>
                     </td>
 
                     <td className="px-4 py-3 break-all">
                       {item.value}
                     </td>
 
-                    <td className="px-4 py-3 text-center font-bold text-red-400">
-                      {item.count}
+                    <td className="px-4 py-3 text-center">
+                      <span className="rounded-lg bg-red-600 px-3 py-1 font-bold">
+                        {item.count}
+                      </span>
                     </td>
                   </tr>
                 )
