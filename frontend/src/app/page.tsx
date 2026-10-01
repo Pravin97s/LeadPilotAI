@@ -1,6 +1,7 @@
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import DashboardCards from "@/components/DashboardCards";
+import DashboardFilters from "@/components/DashboardFilters";
 import UploadBox from "@/components/UploadBox";
 import FileInfo from "@/components/FileInfo";
 import ColumnMapper from "@/components/ColumnMapper";
@@ -32,8 +33,13 @@ export default function Home() {
         <Navbar />
 
         <div className="space-y-8 p-8">
+
           <section id="dashboard">
             <DashboardCards />
+          </section>
+
+          <section id="filters">
+            <DashboardFilters />
           </section>
 
           <section id="upload">
@@ -112,6 +118,7 @@ export default function Home() {
           <section id="ai-dashboard-settings">
             <AIDashboardSettings />
           </section>
+
         </div>
       </section>
     </main>
