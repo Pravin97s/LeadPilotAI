@@ -12,6 +12,7 @@ import StatusPieChart from "@/components/StatusPieChart";
 import LeadsTable from "@/components/LeadsTable";
 import AllInsights from "@/components/AllInsights";
 import AIInsights from "@/components/AIInsights";
+import AILeadScore from "@/components/AILeadScore";
 
 export default function Home() {
   return (
@@ -62,6 +63,10 @@ export default function Home() {
 
           <section id="ai-insights">
             <AIInsights />
+          </section>
+
+          <section id="ai-lead-score">
+            <AILeadScore />
           </section>
 
           <section id="export">
