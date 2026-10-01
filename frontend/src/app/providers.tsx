@@ -3,6 +3,7 @@
 import { DashboardProvider } from "@/providers/DashboardProvider";
 import { SearchProvider } from "@/providers/SearchProvider";
 import { FilterProvider } from "@/context/FilterContext";
+import { SettingsProvider } from "@/context/SettingsContext";
 
 export default function Providers({
   children,
@@ -10,12 +11,14 @@ export default function Providers({
   children: React.ReactNode;
 }) {
   return (
-    <DashboardProvider>
-      <SearchProvider>
-        <FilterProvider>
-          {children}
-        </FilterProvider>
-      </SearchProvider>
-    </DashboardProvider>
+    <SettingsProvider>
+      <DashboardProvider>
+        <SearchProvider>
+          <FilterProvider>
+            {children}
+          </FilterProvider>
+        </SearchProvider>
+      </DashboardProvider>
+    </SettingsProvider>
   );
 }
