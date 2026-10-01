@@ -1,6 +1,7 @@
 "use client";
 
 import useDashboard from "@/hooks/useDashboard";
+import useFilteredRows from "@/hooks/useFilteredRows";
 import { statusChartData } from "@/utils/status";
 import {
   ResponsiveContainer,
@@ -13,10 +14,9 @@ import {
 } from "recharts";
 
 export default function ConversionChart() {
-  const {
-    rows,
-    columnMapping,
-  } = useDashboard();
+  const { columnMapping } = useDashboard();
+
+  const rows = useFilteredRows();
 
   const data = statusChartData(
     rows,
@@ -24,7 +24,17 @@ export default function ConversionChart() {
   );
 
   if (rows.length === 0) {
-    return null;
+    return (
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="text-xl font-semibold">
+          Lead Status
+        </h2>
+
+        <div className="flex h-80 items-center justify-center text-slate-400">
+          No data available
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -34,7 +44,10 @@ export default function ConversionChart() {
       </h2>
 
       <div className="mt-6 h-80">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+        >
           <BarChart data={data}>
             <CartesianGrid stroke="#334155" />
 
