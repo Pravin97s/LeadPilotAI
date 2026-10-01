@@ -19,6 +19,7 @@ import AICSVSummary from "@/components/AICSVSummary";
 import AIDuplicateDetection from "@/components/AIDuplicateDetection";
 import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 import AIChatAssistant from "@/components/AIChatAssistant";
+import AIExportReport from "@/components/AIExportReport";
 
 export default function Home() {
   return (
@@ -100,6 +101,7 @@ export default function Home() {
 </section>
 
           <section id="export">
+            <AIExportReport />
           </section>
 
         </div>
