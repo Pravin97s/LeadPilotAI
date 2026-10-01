@@ -16,6 +16,7 @@ import AILeadScore from "@/components/AILeadScore";
 import AIDataQuality from "@/components/AIDataQuality";
 import AISmartRecommendations from "@/components/AISmartRecommendations";
 import AICSVSummary from "@/components/AICSVSummary";
+import AIDuplicateDetection from "@/components/AIDuplicateDetection";
 
 export default function Home() {
   return (
@@ -82,6 +83,10 @@ export default function Home() {
 
           <section id="ai-csv-summary">
             <AICSVSummary />
+          </section>
+
+          <section id="ai-duplicate-detection">
+            <AIDuplicateDetection />
           </section>
 
           <section id="export">
