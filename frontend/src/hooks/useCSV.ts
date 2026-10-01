@@ -11,106 +11,98 @@ export default function useCSV() {
     setSelectedFile,
     setHeaders,
     setColumnMapping,
+    autoAnalyze,
+    refreshDashboard,
   } = useDashboard();
 
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
 
   const uploadCSV = useCallback(
     (file: File) => {
-      setLoading(true);
+      if (!file.name.toLowerCase().endsWith(".csv")) {
+        setError("Please upload a valid CSV file.");
+        return;
+      }
 
+      setLoading(true);
       setError("");
 
       Papa.parse<CSVRow>(file, {
         header: true,
-
         skipEmptyLines: true,
+        dynamicTyping: true,
 
         complete: (result) => {
           const headers =
-            result.meta.fields?.filter(Boolean) ??
-            [];
+            result.meta.fields?.filter(Boolean) ?? [];
+
+          const cleanRows = result.data.filter((row) =>
+            Object.values(row).some(
+              (value) =>
+                value !== null &&
+                value !== undefined &&
+                String(value).trim() !== ""
+            )
+          );
 
           setHeaders(headers);
-
-          setRows(result.data);
-
+          setRows(cleanRows);
           setSelectedFile(file.name);
 
-          const autoMapping: Record<
-            string,
-            string
-          > = {};
+          const autoMapping: Record<string, string> = {};
 
           headers.forEach((header) => {
-            const value =
-              header.toLowerCase();
+            const value = header.toLowerCase();
 
-            if (
-              value.includes("name")
-            ) {
-              autoMapping["Lead Name"] =
-                header;
-            }
+            if (value.includes("name"))
+              autoMapping["Lead Name"] = header;
 
-            if (
-              value.includes("email")
-            ) {
-              autoMapping["Email"] =
-                header;
-            }
+            if (value.includes("email"))
+              autoMapping["Email"] = header;
 
             if (
               value.includes("phone") ||
               value.includes("mobile")
-            ) {
-              autoMapping["Phone"] =
-                header;
-            }
+            )
+              autoMapping["Phone"] = header;
 
-            if (
-              value.includes("company")
-            ) {
-              autoMapping["Company"] =
-                header;
-            }
+            if (value.includes("company"))
+              autoMapping["Company"] = header;
 
-            if (
-              value.includes("source")
-            ) {
-              autoMapping["Source"] =
-                header;
-            }
+            if (value.includes("source"))
+              autoMapping["Source"] = header;
 
-            if (
-              value.includes("status")
-            ) {
-              autoMapping["Status"] =
-                header;
-            }
+            if (value.includes("status"))
+              autoMapping["Status"] = header;
 
             if (
               value.includes("revenue") ||
               value.includes("amount") ||
               value.includes("value")
-            ) {
-              autoMapping["Revenue"] =
-                header;
-            }
+            )
+              autoMapping["Revenue"] = header;
 
             if (
               value.includes("date") ||
               value.includes("created")
-            ) {
-              autoMapping["Date"] =
-                header;
-            }
+            )
+              autoMapping["Date"] = header;
           });
 
-          setColumnMapping(
-            autoMapping
+          setColumnMapping(autoMapping);
+
+          if (autoAnalyze) {
+            refreshDashboard();
+          }
+
+          window.dispatchEvent(
+            new CustomEvent("csv-uploaded", {
+              detail: {
+                rows: cleanRows.length,
+                headers,
+              },
+            })
           );
 
           setLoading(false);
@@ -118,7 +110,6 @@ export default function useCSV() {
 
         error: (err) => {
           setError(err.message);
-
           setLoading(false);
         },
       });
@@ -128,6 +119,8 @@ export default function useCSV() {
       setSelectedFile,
       setHeaders,
       setColumnMapping,
+      autoAnalyze,
+      refreshDashboard,
     ]
   );
 

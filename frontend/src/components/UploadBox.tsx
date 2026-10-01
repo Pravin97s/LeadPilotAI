@@ -1,19 +1,25 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { Upload, CheckCircle2, Loader2 } from "lucide-react";
 import useCSV from "@/hooks/useCSV";
+import useDashboard from "@/hooks/useDashboard";
 
 export default function UploadBox() {
   const { uploadCSV, loading, error } = useCSV();
+
+  const {
+    selectedFile,
+    rows,
+    headers,
+    autoAnalyze,
+  } = useDashboard();
 
   function handleChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     uploadCSV(file);
   }
@@ -26,11 +32,11 @@ export default function UploadBox() {
 
       <label className="mt-6 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-700 p-12 transition hover:border-blue-500">
         <Upload
-          size={50}
+          size={52}
           className="text-blue-500"
         />
 
-        <p className="mt-4 text-lg font-medium">
+        <p className="mt-4 text-lg font-semibold">
           Click to Upload CSV
         </p>
 
@@ -41,21 +47,76 @@ export default function UploadBox() {
         <input
           type="file"
           accept=".csv"
-          onChange={handleChange}
           className="hidden"
+          onChange={handleChange}
         />
       </label>
 
       {loading && (
-        <p className="mt-4 text-blue-400">
-          Uploading...
-        </p>
+        <div className="mt-6 flex items-center gap-3 rounded-xl bg-blue-950/40 p-4 text-blue-400">
+          <Loader2
+            className="animate-spin"
+            size={22}
+          />
+          Parsing CSV...
+        </div>
       )}
 
       {error && (
-        <p className="mt-4 text-red-500">
+        <div className="mt-6 rounded-xl bg-red-950/40 p-4 text-red-400">
           {error}
-        </p>
+        </div>
+      )}
+
+      {selectedFile && !loading && (
+        <div className="mt-6 rounded-xl border border-green-700 bg-green-950/30 p-5">
+          <div className="flex items-center gap-2 text-green-400">
+            <CheckCircle2 size={20} />
+            <span className="font-semibold">
+              Upload Successful
+            </span>
+          </div>
+
+          <div className="mt-4 space-y-2 text-sm">
+            <p>
+              <span className="text-slate-400">
+                File:
+              </span>{" "}
+              {selectedFile}
+            </p>
+
+            <p>
+              <span className="text-slate-400">
+                Rows:
+              </span>{" "}
+              {rows.length}
+            </p>
+
+            <p>
+              <span className="text-slate-400">
+                Columns:
+              </span>{" "}
+              {headers.length}
+            </p>
+
+            <p>
+              <span className="text-slate-400">
+                Auto Analyze:
+              </span>{" "}
+              <span
+                className={
+                  autoAnalyze
+                    ? "text-green-400"
+                    : "text-yellow-400"
+                }
+              >
+                {autoAnalyze
+                  ? "Enabled"
+                  : "Disabled"}
+              </span>
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
