@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   LayoutDashboard,
   Upload,
@@ -11,39 +12,32 @@ import {
 } from "lucide-react";
 
 const menus = [
-  {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-  },
-  {
-    icon: Upload,
-    label: "Upload CSV",
-  },
-  {
-    icon: BarChart3,
-    label: "Analytics",
-  },
-  {
-    icon: PieChart,
-    label: "Charts",
-  },
-  {
-    icon: Table2,
-    label: "Leads",
-  },
-  {
-    icon: Brain,
-    label: "AI Insights",
-  },
-  {
-    icon: Download,
-    label: "Export",
-  },
+  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+  { icon: Upload, label: "Upload CSV", id: "upload" },
+  { icon: BarChart3, label: "Analytics", id: "analytics" },
+  { icon: PieChart, label: "Charts", id: "charts" },
+  { icon: Table2, label: "Leads", id: "leads" },
+  { icon: Brain, label: "AI Insights", id: "insights" },
+  { icon: Download, label: "Export", id: "export" },
 ];
 
 export default function Sidebar() {
+  const [active, setActive] = useState("dashboard");
+
+  const handleClick = (id: string) => {
+    setActive(id);
+
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
-    <aside className="w-72 min-h-screen bg-slate-900 border-r border-slate-800 p-6">
+    <aside className="w-72 min-h-screen bg-slate-900 border-r border-slate-800 p-6 sticky top-0">
       <h1 className="text-3xl font-bold text-blue-500">
         LeadPilot AI
       </h1>
@@ -58,11 +52,15 @@ export default function Sidebar() {
 
           return (
             <button
-              key={item.label}
-              className="w-full flex items-center gap-4 rounded-xl px-4 py-3 hover:bg-slate-800 transition"
+              key={item.id}
+              onClick={() => handleClick(item.id)}
+              className={`w-full flex items-center gap-4 rounded-xl px-4 py-3 transition ${
+                active === item.id
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-slate-800"
+              }`}
             >
               <Icon size={20} />
-
               <span>{item.label}</span>
             </button>
           );

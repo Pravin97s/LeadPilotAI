@@ -1,23 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useDashboard } from "@/providers/DashboardProvider";
+import { useMemo, useState, useEffect } from "react";
+import { CSVRow } from "@/types/csv";
 import { paginate, getTotalPages } from "@/utils/pagination";
 
-export default function usePagination(pageSize = 10) {
-  const { rows } = useDashboard();
-
+export default function usePagination(
+  rows: CSVRow[],
+  pageSize = 10
+) {
   const [page, setPage] = useState(1);
 
-  const totalPages = useMemo(
-    () => getTotalPages(rows.length, pageSize),
-    [rows, pageSize]
-  );
+  useEffect(() => {
+    setPage(1);
+  }, [rows]);
 
-  const paginatedRows = useMemo(
-    () => paginate(rows, page, pageSize),
-    [rows, page, pageSize]
-  );
+  const totalPages = useMemo(() => {
+    return Math.max(1, getTotalPages(rows.length, pageSize));
+  }, [rows, pageSize]);
+
+  const paginatedRows = useMemo(() => {
+    return paginate(rows, page, pageSize);
+  }, [rows, page, pageSize]);
 
   function nextPage() {
     setPage((prev) => Math.min(prev + 1, totalPages));
@@ -37,9 +40,9 @@ export default function usePagination(pageSize = 10) {
     page,
     totalPages,
     paginatedRows,
-    setPage,
     nextPage,
     previousPage,
     goToPage,
+    setPage,
   };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardProvider } from "@/providers/DashboardProvider";
+import { SearchProvider } from "@/providers/SearchProvider";
 
 export default function Providers({
   children,
@@ -9,7 +10,9 @@ export default function Providers({
 }) {
   return (
     <DashboardProvider>
-      {children}
+      <SearchProvider>
+        {children}
+      </SearchProvider>
     </DashboardProvider>
   );
 }

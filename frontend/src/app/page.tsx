@@ -21,30 +21,45 @@ export default function Home() {
         <Navbar />
 
         <div className="p-8 space-y-8">
-          <DashboardCards />
+          <section id="dashboard">
+            <DashboardCards />
+          </section>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <UploadBox />
-            <FileInfo />
-          </div>
+          <section id="upload">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <UploadBox />
+              <FileInfo />
+            </div>
 
-          <ColumnMapper />
+            <ColumnMapper />
+          </section>
 
-          <KPISection />
+          <section id="analytics">
+            <KPISection />
+          </section>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <RevenueChart />
-            <LeadGrowthChart />
-          </div>
+          <section id="charts">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <RevenueChart />
+              <LeadGrowthChart />
+            </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <ConversionChart />
-            <StatusPieChart />
-          </div>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <ConversionChart />
+              <StatusPieChart />
+            </div>
+          </section>
 
-          <LeadsTable />
+          <section id="leads">
+            <LeadsTable />
+          </section>
 
-          <AllInsights />
+          <section id="insights">
+            <AllInsights />
+          </section>
+
+          <section id="export">
+          </section>
         </div>
       </section>
     </main>
