@@ -13,6 +13,7 @@ import LeadsTable from "@/components/LeadsTable";
 import AllInsights from "@/components/AllInsights";
 import AIInsights from "@/components/AIInsights";
 import AILeadScore from "@/components/AILeadScore";
+import AIDataQuality from "@/components/AIDataQuality";
 
 export default function Home() {
   return (
@@ -67,6 +68,10 @@ export default function Home() {
 
           <section id="ai-lead-score">
             <AILeadScore />
+          </section>
+
+          <section id="ai-data-quality">
+            <AIDataQuality />
           </section>
 
           <section id="export">
