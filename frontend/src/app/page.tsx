@@ -17,6 +17,7 @@ import AIDataQuality from "@/components/AIDataQuality";
 import AISmartRecommendations from "@/components/AISmartRecommendations";
 import AICSVSummary from "@/components/AICSVSummary";
 import AIDuplicateDetection from "@/components/AIDuplicateDetection";
+import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 
 export default function Home() {
   return (
@@ -88,6 +89,10 @@ export default function Home() {
           <section id="ai-duplicate-detection">
             <AIDuplicateDetection />
           </section>
+
+          <section id="ai-predictive-analytics">
+  <AIPredictiveAnalytics />
+</section>
 
           <section id="export">
           </section>
