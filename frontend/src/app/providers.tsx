@@ -2,6 +2,7 @@
 
 import { DashboardProvider } from "@/providers/DashboardProvider";
 import { SearchProvider } from "@/providers/SearchProvider";
+import { FilterProvider } from "@/context/FilterContext";
 
 export default function Providers({
   children,
@@ -11,7 +12,9 @@ export default function Providers({
   return (
     <DashboardProvider>
       <SearchProvider>
-        {children}
+        <FilterProvider>
+          {children}
+        </FilterProvider>
       </SearchProvider>
     </DashboardProvider>
   );
