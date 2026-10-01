@@ -20,6 +20,7 @@ import AIDuplicateDetection from "@/components/AIDuplicateDetection";
 import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 import AIChatAssistant from "@/components/AIChatAssistant";
 import AIExportReport from "@/components/AIExportReport";
+import AILeadRanking from "@/components/AILeadRanking";
 
 export default function Home() {
   return (
@@ -103,6 +104,10 @@ export default function Home() {
           <section id="export">
             <AIExportReport />
           </section>
+
+          <section id="ai-lead-ranking">
+  <AILeadRanking />
+</section>
 
         </div>
       </section>
