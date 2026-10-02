@@ -1,8 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
 });
 
 export async function POST(request: Request) {
@@ -10,29 +10,45 @@ export async function POST(request: Request) {
     const { analytics } = await request.json();
 
     const prompt = `
-You are a business data analyst.
+You are an expert business data analyst.
 
-Analyze this dashboard analytics and provide exactly 5 concise business insights.
+Analyze the following dashboard analytics and provide exactly 5 concise business insights.
 
 Analytics:
 ${JSON.stringify(analytics, null, 2)}
 
 Rules:
 - Return only bullet points.
-- One insight per line.
-- Keep each point under 20 words.
+- Exactly 5 bullet points.
+- Maximum 20 words per point.
+- Focus on trends, anomalies, opportunities, and business recommendations.
 `;
 
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.3,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert business intelligence and analytics assistant.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
     });
 
+    const insights =
+      completion.choices[0]?.message?.content ??
+      "Unable to generate AI insights.";
+
     return NextResponse.json({
-      insights: result.text,
+      insights,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Groq Error:", error);
 
     return NextResponse.json(
       {
