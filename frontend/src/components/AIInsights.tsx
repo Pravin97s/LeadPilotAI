@@ -41,9 +41,9 @@ export default function AIInsights() {
     insights.push("No duplicate rows detected.");
   }
 
-  if (analytics.revenue > 0) {
+  if (analytics.totalRevenue > 0) {
     insights.push(
-      `Estimated total revenue is ₹${analytics.revenue.toLocaleString()}.`
+      `Estimated total revenue is ₹${analytics.totalRevenue.toLocaleString()}.`
     );
   }
 
