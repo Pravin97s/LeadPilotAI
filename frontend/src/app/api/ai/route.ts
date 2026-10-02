@@ -1,33 +1,42 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
 
 export async function POST(req: Request) {
   try {
+    console.log("API KEY EXISTS:", !!process.env.GROQ_API_KEY);
+    console.log("API KEY START:", process.env.GROQ_API_KEY?.substring(0, 10));
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+
     const { prompt } = await req.json();
 
-    const response = await ai.models.generateContent({
-  model: "gemini-3.1-pro-preview",
-  contents: prompt,
-});
+    const completion = await groq.chat.completions.create({
+      model: "openai/gpt-oss-20b",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
 
     return NextResponse.json({
       success: true,
-      text: response.text,
+      text: completion.choices[0].message.content,
     });
-  } catch (error: any) {
-    console.error("FULL ERROR:");
-    console.error(error);
+  } catch (err: any) {
+    console.error(err);
 
     return NextResponse.json(
       {
         success: false,
-        error: String(error),
+        error: err.message,
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
