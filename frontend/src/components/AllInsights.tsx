@@ -71,8 +71,8 @@ export default function AllInsights() {
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <h2 className="text-2xl font-bold">
-        AI Insights
-      </h2>
+  Dataset Insights
+</h2>
 
       <div className="mt-6 space-y-4">
         {insights.map((item, index) => (
