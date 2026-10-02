@@ -1,7 +1,6 @@
 "use client";
 
 import { DashboardProvider } from "@/providers/DashboardProvider";
-import { SearchProvider } from "@/providers/SearchProvider";
 import { FilterProvider } from "@/context/FilterContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 
@@ -13,12 +12,10 @@ export default function Providers({
   return (
     <SettingsProvider>
       <DashboardProvider>
-        <SearchProvider>
-          <FilterProvider>
-            {children}
-          </FilterProvider>
-        </SearchProvider>
-      </DashboardProvider>
+  <FilterProvider>
+    {children}
+  </FilterProvider>
+</DashboardProvider>
     </SettingsProvider>
   );
 }

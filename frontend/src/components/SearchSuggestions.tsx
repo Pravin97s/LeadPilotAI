@@ -2,16 +2,17 @@
 
 import { useMemo } from "react";
 import useDashboard from "@/hooks/useDashboard";
-import useSearch from "@/hooks/useSearch";
+import { useFilter } from "@/context/FilterContext";
 
 export default function SearchSuggestions() {
   const { rows } = useDashboard();
-  const { query, setQuery } = useSearch();
+
+  const { search, setSearch } = useFilter();
 
   const suggestions = useMemo(() => {
-    const search = query.trim().toLowerCase();
+    const searchText = search.trim().toLowerCase();
 
-    if (!search) return [];
+    if (!searchText) return [];
 
     const values = new Set<string>();
 
@@ -21,7 +22,7 @@ export default function SearchSuggestions() {
 
         if (
           text &&
-          text.toLowerCase().includes(search)
+          text.toLowerCase().includes(searchText)
         ) {
           values.add(text);
         }
@@ -29,19 +30,19 @@ export default function SearchSuggestions() {
     });
 
     return [...values].slice(0, 6);
-  }, [rows, query]);
+  }, [rows, search]);
 
-  if (!query.trim() || suggestions.length === 0) {
+  if (!search.trim() || suggestions.length === 0) {
     return null;
   }
 
   return (
-    <div className="absolute left-0 top-full mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 shadow-xl overflow-hidden z-50">
+    <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-xl">
       {suggestions.map((item) => (
         <button
           key={item}
-          onClick={() => setQuery(item)}
-          className="w-full px-4 py-3 text-left hover:bg-slate-800 transition"
+          onClick={() => setSearch(item)}
+          className="w-full px-4 py-3 text-left transition hover:bg-slate-800"
         >
           {item}
         </button>

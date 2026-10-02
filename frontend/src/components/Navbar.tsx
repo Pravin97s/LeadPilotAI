@@ -7,16 +7,15 @@ import {
   X,
 } from "lucide-react";
 
-import useSearch from "@/hooks/useSearch";
 import useDashboard from "@/hooks/useDashboard";
+import useFilteredRows from "@/hooks/useFilteredRows";
+import { useFilter } from "@/context/FilterContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
 
 export default function Navbar() {
-  const {
-    query,
-    setQuery,
-    filteredRows,
-  } = useSearch();
+  const { search, setSearch } = useFilter();
+
+  const filteredRows = useFilteredRows();
 
   const { rows } = useDashboard();
 
@@ -41,28 +40,28 @@ export default function Navbar() {
             />
 
             <input
-  type="text"
-  placeholder="Search leads..."
-  value={query}
-  onChange={(e) => setQuery(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      const section = document.getElementById("leads");
+              type="text"
+              placeholder="Search leads..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const section = document.getElementById("leads");
 
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }
-  }}
-  className="w-full rounded-xl border border-slate-700 bg-slate-900 py-3 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500"
-/>
+                  if (section) {
+                    section.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }
+              }}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900 py-3 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500"
+            />
 
-            {query && (
+            {search && (
               <button
-                onClick={() => setQuery("")}
+                onClick={() => setSearch("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 <X
@@ -85,7 +84,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {query.trim() !== "" && (
+      {search.trim() !== "" && (
         <div className="border-t border-slate-800 bg-slate-900 px-8 py-2">
           {filteredRows.length > 0 ? (
             <div className="flex items-center justify-between">

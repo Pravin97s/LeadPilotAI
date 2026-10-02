@@ -2,7 +2,7 @@
 
 import useDashboard from "@/hooks/useDashboard";
 import useFilteredRows from "@/hooks/useFilteredRows";
-import useSearch from "@/hooks/useSearch";
+import { useFilter } from "@/context/FilterContext";
 import usePagination from "@/hooks/usePagination";
 import { CSVRow } from "@/types/csv";
 
@@ -31,8 +31,7 @@ function HighlightedText({
   return (
     <>
       {parts.map((part, index) =>
-        part.toLowerCase() ===
-        normalizedSearch.toLowerCase() ? (
+        part.toLowerCase() === normalizedSearch.toLowerCase() ? (
           <mark
             key={index}
             className="rounded bg-yellow-300 px-1 text-black"
@@ -52,7 +51,7 @@ export default function LeadsTable() {
 
   const rows = useFilteredRows();
 
-  const { query } = useSearch();
+  const { search } = useFilter();
 
   const {
     page,
@@ -107,9 +106,9 @@ export default function LeadsTable() {
           </p>
         </div>
 
-        {query && (
+        {search && (
           <span className="rounded-full bg-blue-600 px-4 py-2 text-sm">
-            Search: "{query}"
+            Search: "{search}"
           </span>
         )}
       </div>
@@ -130,28 +129,24 @@ export default function LeadsTable() {
           </thead>
 
           <tbody>
-            {paginatedRows.map(
-              (row: CSVRow, index: number) => (
-                <tr
-                  key={index}
-                  className="border-t border-slate-800 hover:bg-slate-800/40"
-                >
-                  {headers.map((header) => (
-                    <td
-                      key={header}
-                      className="whitespace-nowrap px-4 py-3"
-                    >
-                      <HighlightedText
-                        text={String(
-                          row[header] ?? ""
-                        )}
-                        search={query}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              )
-            )}
+            {paginatedRows.map((row: CSVRow, index: number) => (
+              <tr
+                key={index}
+                className="border-t border-slate-800 hover:bg-slate-800/40"
+              >
+                {headers.map((header) => (
+                  <td
+                    key={header}
+                    className="whitespace-nowrap px-4 py-3"
+                  >
+                    <HighlightedText
+                      text={String(row[header] ?? "")}
+                      search={search}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
