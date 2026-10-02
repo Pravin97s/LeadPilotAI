@@ -6,12 +6,19 @@ body {
   padding: 0;
   min-height: 100%;
   background: #020617;
-  color: white;
+  color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
   scroll-behavior: smooth;
 }
 
-* {
+body {
+  background: #020617;
+  color: #ffffff;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -28,24 +35,35 @@ input,
 select,
 textarea {
   outline: none;
+  color: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+select option {
+  background: #1e293b;
+  color: #ffffff;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  color: #ffffff;
 }
 
 th,
 td {
   text-align: left;
+  color: inherit;
 }
 
 ::selection {
   background: #2563eb;
-  color: white;
+  color: #ffffff;
 }
-
-/* Scrollbar */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -64,10 +82,6 @@ td {
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
-
-/* ===========================
-   Compact View
-=========================== */
 
 .compact-view section {
   padding: 16px !important;
@@ -102,42 +116,10 @@ td {
   padding: 8px 12px !important;
 }
 
-/* ===========================
-   Disable Animations
-=========================== */
-
 .no-animation *,
 .no-animation *::before,
 .no-animation *::after {
   animation: none !important;
   transition: none !important;
   scroll-behavior: auto !important;
-}
-
-/* ===========================
-   Dark Mode
-=========================== */
-
-.dark body {
-  background: #020617;
-  color: white;
-}
-
-/* ===========================
-   Light Mode
-=========================== */
-
-body:not(.dark) {
-  background: #ffffff;
-  color: #111827;
-}
-
-body:not(.dark) table {
-  color: #111827;
-}
-
-body:not(.dark) input,
-body:not(.dark) textarea,
-body:not(.dark) select {
-  color: #111827;
 }
