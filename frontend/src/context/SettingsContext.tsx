@@ -4,25 +4,29 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   ReactNode,
 } from "react";
 
-type SettingsContextType = {
+interface SettingsContextType {
   darkMode: boolean;
-  compactView: boolean;
-  animations: boolean;
-  autoRefresh: boolean;
-
   setDarkMode: (value: boolean) => void;
+
+  compactView: boolean;
   setCompactView: (value: boolean) => void;
+
+  animations: boolean;
   setAnimations: (value: boolean) => void;
+
+  autoRefresh: boolean;
   setAutoRefresh: (value: boolean) => void;
 
   resetSettings: () => void;
-};
+}
 
-const SettingsContext = createContext<SettingsContextType | null>(null);
+const SettingsContext =
+  createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({
   children,
@@ -41,10 +45,10 @@ export function SettingsProvider({
 
     const settings = JSON.parse(saved);
 
-    setDarkMode(settings.darkMode ?? true);
-    setCompactView(settings.compactView ?? false);
-    setAnimations(settings.animations ?? true);
-    setAutoRefresh(settings.autoRefresh ?? false);
+    setDarkMode(settings.darkMode);
+    setCompactView(settings.compactView);
+    setAnimations(settings.animations);
+    setAutoRefresh(settings.autoRefresh);
   }, []);
 
   useEffect(() => {
@@ -57,17 +61,50 @@ export function SettingsProvider({
         autoRefresh,
       })
     );
-
-    document.documentElement.classList.toggle(
-      "dark",
-      darkMode
-    );
   }, [
     darkMode,
     compactView,
     animations,
     autoRefresh,
   ]);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      document.body.classList.remove("bg-white");
+      document.body.classList.add("bg-slate-950");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("bg-slate-950");
+      document.body.classList.add("bg-white");
+    }
+  }, [darkMode]);
+
+  useEffect(() => {
+    if (compactView) {
+      document.body.classList.add("compact-view");
+    } else {
+      document.body.classList.remove("compact-view");
+    }
+  }, [compactView]);
+
+  useEffect(() => {
+    if (animations) {
+      document.body.classList.remove("no-animation");
+    } else {
+      document.body.classList.add("no-animation");
+    }
+  }, [animations]);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const id = setInterval(() => {
+      window.location.reload();
+    }, 60000);
+
+    return () => clearInterval(id);
+  }, [autoRefresh]);
 
   function resetSettings() {
     setDarkMode(true);
@@ -76,22 +113,32 @@ export function SettingsProvider({
     setAutoRefresh(false);
   }
 
+  const value = useMemo(
+    () => ({
+      darkMode,
+      setDarkMode,
+
+      compactView,
+      setCompactView,
+
+      animations,
+      setAnimations,
+
+      autoRefresh,
+      setAutoRefresh,
+
+      resetSettings,
+    }),
+    [
+      darkMode,
+      compactView,
+      animations,
+      autoRefresh,
+    ]
+  );
+
   return (
-    <SettingsContext.Provider
-      value={{
-        darkMode,
-        compactView,
-        animations,
-        autoRefresh,
-
-        setDarkMode,
-        setCompactView,
-        setAnimations,
-        setAutoRefresh,
-
-        resetSettings,
-      }}
-    >
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );

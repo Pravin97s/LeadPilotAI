@@ -8,6 +8,7 @@ body {
   background: #020617;
   color: white;
   font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -22,6 +23,29 @@ a {
 button {
   cursor: pointer;
 }
+
+input,
+select,
+textarea {
+  outline: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+}
+
+::selection {
+  background: #2563eb;
+  color: white;
+}
+
+/* Scrollbar */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -41,23 +65,79 @@ button {
   background: #475569;
 }
 
-input,
-select,
-textarea {
-  outline: none;
+/* ===========================
+   Compact View
+=========================== */
+
+.compact-view section {
+  padding: 16px !important;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
+.compact-view h1 {
+  font-size: 1.8rem !important;
+  line-height: 1.2;
 }
 
-th,
-td {
-  text-align: left;
+.compact-view h2 {
+  font-size: 1.35rem !important;
+  line-height: 1.2;
 }
 
-::selection {
-  background: #2563eb;
+.compact-view p {
+  font-size: 0.92rem !important;
+}
+
+.compact-view table th,
+.compact-view table td {
+  padding: 8px !important;
+}
+
+.compact-view button {
+  padding: 8px 14px !important;
+}
+
+.compact-view input,
+.compact-view select,
+.compact-view textarea {
+  padding: 8px 12px !important;
+}
+
+/* ===========================
+   Disable Animations
+=========================== */
+
+.no-animation *,
+.no-animation *::before,
+.no-animation *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* ===========================
+   Dark Mode
+=========================== */
+
+.dark body {
+  background: #020617;
   color: white;
+}
+
+/* ===========================
+   Light Mode
+=========================== */
+
+body:not(.dark) {
+  background: #ffffff;
+  color: #111827;
+}
+
+body:not(.dark) table {
+  color: #111827;
+}
+
+body:not(.dark) input,
+body:not(.dark) textarea,
+body:not(.dark) select {
+  color: #111827;
 }

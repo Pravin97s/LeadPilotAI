@@ -1,3 +1,7 @@
+"use client";
+
+import { useSettings } from "@/context/SettingsContext";
+
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import DashboardCards from "@/components/DashboardCards";
@@ -25,6 +29,8 @@ import AIExportReport from "@/components/AIExportReport";
 import AIDashboardSettings from "@/components/AIDashboardSettings";
 
 export default function Home() {
+  const { compactView, animations } = useSettings();
+
   return (
     <main className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
@@ -32,8 +38,20 @@ export default function Home() {
       <section className="flex-1 overflow-y-auto">
         <Navbar />
 
-        <div className="space-y-8 p-8">
-
+        <div
+          className={`
+            ${
+              compactView
+                ? "space-y-4 p-4"
+                : "space-y-8 p-8"
+            }
+            ${
+              animations
+                ? "transition-all duration-300"
+                : ""
+            }
+          `}
+        >
           <section id="dashboard">
             <DashboardCards />
           </section>
@@ -118,7 +136,6 @@ export default function Home() {
           <section id="ai-dashboard-settings">
             <AIDashboardSettings />
           </section>
-
         </div>
       </section>
     </main>
