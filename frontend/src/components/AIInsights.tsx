@@ -13,67 +13,48 @@ export default function AIInsights() {
   useEffect(() => {
     if (analytics.totalRows === 0) return;
 
+    const controller = new AbortController();
+
     async function generateInsights() {
       setLoading(true);
 
       try {
-        const res = await fetch("/api/ai", {
+        const res = await fetch("/api/insights", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            prompt: `
-You are an expert sales analyst.
-
-Analyze the following sales dataset.
-
-Dataset Summary:
-- Total Rows: ${analytics.totalRows}
-- Missing Values: ${analytics.missingValues}
-- Duplicate Rows: ${analytics.duplicateRows}
-- Total Revenue: ₹${analytics.totalRevenue}
-- Average Revenue: ₹${analytics.averageRevenue}
-- Highest Revenue: ₹${analytics.highestRevenue}
-- Lowest Revenue: ₹${analytics.lowestRevenue}
-
-Generate:
-
-• Key business insights
-• Data quality observations
-• Sales trends
-• Revenue opportunities
-• Marketing recommendations
-
-Return only short bullet points.
-`,
-          }),
+          body: JSON.stringify({ analytics }),
+          signal: controller.signal,
         });
 
-        const data = await res.json();
+        const data = await res.json() as { insights?: unknown; error?: string };
 
-        if (!data.success) {
-          setInsights(["Failed to generate AI insights."]);
+        if (!res.ok || typeof data.insights !== "string") {
+          setInsights([data.error || "Failed to generate AI insights."]);
           return;
         }
 
-        const lines = data.text
+        const lines = data.insights
           .split("\n")
           .map((line: string) =>
-            line.replace(/^[-*•0-9.]\s*/, "").trim()
+            line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim()
           )
           .filter((line: string) => line.length > 0);
 
-        setInsights(lines);
+        setInsights(lines.length > 0 ? lines : ["No insights were returned. Please try again."]);
       } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
         console.error(error);
-        setInsights(["Unable to connect to Gemini API."]);
+        setInsights(["Unable to connect to Groq. Check the server API key and try again."]);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     generateInsights();
+
+    return () => controller.abort();
   }, [analytics]);
 
   if (analytics.totalRows === 0) {
@@ -104,7 +85,7 @@ Return only short bullet points.
           <div className="h-10 animate-pulse rounded bg-slate-800" />
           <div className="h-10 animate-pulse rounded bg-slate-800" />
           <p className="text-slate-400">
-            Gemini AI is analyzing your dataset...
+            Groq is analyzing your dataset...
           </p>
         </div>
       ) : (
