@@ -44,25 +44,29 @@ export default function RevenueChart() {
         Monthly Revenue
       </h2>
 
-      <div className="mt-6 h-80">
+      <div className="chart-frame mt-6">
         <ResponsiveContainer
           width="100%"
           height="100%"
+          minWidth={1}
+          minHeight={260}
         >
-          <LineChart data={data}>
-            <CartesianGrid stroke="#334155" />
+          <LineChart data={data} margin={{ top: 8, right: 14, left: 0, bottom: 4 }}>
+            <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
 
-            <XAxis dataKey="month" />
+            <XAxis dataKey="month" tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
-            <YAxis />
+            <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
             <Tooltip />
 
             <Line
               type="monotone"
               dataKey="revenue"
-              stroke="#2563eb"
+              stroke="#4c91ff"
               strokeWidth={3}
+              dot={{ r: 3, fill: "#4c91ff" }}
+              activeDot={{ r: 5 }}
             />
           </LineChart>
         </ResponsiveContainer>

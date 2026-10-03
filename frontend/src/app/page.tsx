@@ -27,23 +27,23 @@ import AIPredictiveAnalytics from "@/components/AIPredictiveAnalytics";
 import AIChatAssistant from "@/components/AIChatAssistant";
 import AIExportReport from "@/components/AIExportReport";
 import AIDashboardSettings from "@/components/AIDashboardSettings";
+import { useState } from "react";
 
 export default function Home() {
   const { compactView, animations } = useSettings();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex">
-      <Sidebar />
+    <main className={`app-shell min-h-screen flex ${animations ? "motion-enabled" : ""}`}>
+      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <section className="flex-1 overflow-y-auto">
-        <Navbar />
+      <section className="app-main flex-1 min-w-0">
+        <Navbar onMenuClick={() => setMenuOpen(true)} />
 
         <div
           className={`
             ${
-              compactView
-                ? "space-y-4 p-4"
-                : "space-y-8 p-8"
+            compactView ? "app-content compact-content" : "app-content"
             }
             ${
               animations

@@ -5,14 +5,19 @@ import {
   Bell,
   UserCircle2,
   X,
+  Menu,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useSettings } from "@/context/SettingsContext";
 
 import useDashboard from "@/hooks/useDashboard";
 import useFilteredRows from "@/hooks/useFilteredRows";
 import { useFilter } from "@/context/FilterContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick = () => {} }: { onMenuClick?: () => void }) {
+  const { darkMode, setDarkMode } = useSettings();
   const { search, setSearch } = useFilter();
 
   const filteredRows = useFilteredRows();
@@ -20,10 +25,11 @@ export default function Navbar() {
   const { rows } = useDashboard();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950">
-      <div className="flex items-center justify-between px-8 py-5">
+    <header className="app-navbar sticky top-0 z-40">
+      <div className="navbar-inner flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
+          <button className="mobile-menu-button" onClick={onMenuClick} aria-label="Open navigation"><Menu size={21}/></button>
+          <h1 className="text-2xl font-bold">
             Dashboard
           </h1>
 
@@ -32,8 +38,8 @@ export default function Navbar() {
           </p>
         </div>
 
-        <div className="flex items-center gap-5">
-          <div className="relative w-80">
+        <div className="flex items-center gap-3">
+          <div className="navbar-search relative">
             <Search
               size={18}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -74,11 +80,14 @@ export default function Navbar() {
             <SearchSuggestions />
           </div>
 
-          <button className="rounded-xl border border-slate-700 bg-slate-900 p-3 hover:bg-slate-800">
+          <button className="icon-action" aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Sun size={19}/> : <Moon size={19}/>}
+          </button>
+          <button className="icon-action" aria-label="Notifications">
             <Bell size={20} />
           </button>
 
-          <button className="rounded-full border border-slate-700 bg-slate-900 p-2">
+          <button className="profile-button" aria-label="Profile">
             <UserCircle2 size={34} />
           </button>
         </div>

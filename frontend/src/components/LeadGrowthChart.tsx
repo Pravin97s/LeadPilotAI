@@ -43,26 +43,29 @@ export default function LeadGrowthChart() {
         Monthly Lead Growth
       </h2>
 
-      <div className="mt-6 h-80">
+      <div className="chart-frame mt-6">
         <ResponsiveContainer
           width="100%"
           height="100%"
+          minWidth={1}
+          minHeight={260}
         >
-          <AreaChart data={data}>
-            <CartesianGrid stroke="#334155" />
+          <AreaChart data={data} margin={{ top: 8, right: 14, left: 0, bottom: 4 }}>
+            <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
 
-            <XAxis dataKey="month" />
+            <XAxis dataKey="month" tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
-            <YAxis />
+            <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
             <Tooltip />
 
             <Area
               type="monotone"
               dataKey="leads"
-              stroke="#22c55e"
-              fill="#22c55e"
+              stroke="#23b26d"
+              fill="#23b26d"
               fillOpacity={0.25}
+              strokeWidth={3}
             />
           </AreaChart>
         </ResponsiveContainer>

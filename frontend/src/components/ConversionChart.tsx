@@ -43,23 +43,25 @@ export default function ConversionChart() {
         Lead Status
       </h2>
 
-      <div className="mt-6 h-80">
+      <div className="chart-frame mt-6">
         <ResponsiveContainer
           width="100%"
           height="100%"
+          minWidth={1}
+          minHeight={260}
         >
-          <BarChart data={data}>
-            <CartesianGrid stroke="#334155" />
+          <BarChart data={data} margin={{ top: 8, right: 14, left: 0, bottom: 4 }}>
+            <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
 
-            <XAxis dataKey="name" />
+            <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
-            <YAxis />
+            <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} />
 
             <Tooltip />
 
             <Bar
               dataKey="value"
-              fill="#2563eb"
+              fill="#4c91ff"
               radius={[6, 6, 0, 0]}
             />
           </BarChart>

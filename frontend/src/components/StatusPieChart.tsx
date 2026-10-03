@@ -53,12 +53,14 @@ export default function StatusPieChart() {
         Status Distribution
       </h2>
 
-      <div className="mt-6 h-80">
+      <div className="chart-frame mt-6">
         <ResponsiveContainer
           width="100%"
           height="100%"
+          minWidth={1}
+          minHeight={280}
         >
-          <PieChart>
+          <PieChart margin={{ top: 8, right: 12, left: 12, bottom: 8 }}>
             <Pie
               data={data}
               dataKey="value"
