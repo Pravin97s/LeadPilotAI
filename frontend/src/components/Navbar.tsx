@@ -8,7 +8,9 @@ import {
   Menu,
   Sun,
   Moon,
+  Settings,
 } from "lucide-react";
+import { useState } from "react";
 import { useSettings } from "@/context/SettingsContext";
 
 import useDashboard from "@/hooks/useDashboard";
@@ -18,11 +20,17 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 
 export default function Navbar({ onMenuClick = () => {} }: { onMenuClick?: () => void }) {
   const { darkMode, setDarkMode } = useSettings();
+  const [openPanel, setOpenPanel] = useState<"notifications" | "profile" | null>(null);
   const { search, setSearch } = useFilter();
 
   const filteredRows = useFilteredRows();
 
   const { rows } = useDashboard();
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setOpenPanel(null);
+  };
 
   return (
     <header className="app-navbar sticky top-0 z-40">
@@ -83,13 +91,64 @@ export default function Navbar({ onMenuClick = () => {} }: { onMenuClick?: () =>
           <button className="icon-action" aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(!darkMode)}>
             {darkMode ? <Sun size={19}/> : <Moon size={19}/>}
           </button>
-          <button className="icon-action" aria-label="Notifications">
-            <Bell size={20} />
-          </button>
+          <div className="popover-anchor">
+            <button
+              className="icon-action"
+              aria-label="Notifications"
+              aria-expanded={openPanel === "notifications"}
+              aria-controls="notifications-menu"
+              onClick={() => setOpenPanel(openPanel === "notifications" ? null : "notifications")}
+            >
+              <Bell size={20} />
+              {rows.length > 0 && <span className="notification-dot" aria-hidden="true" />}
+            </button>
+            {openPanel === "notifications" && (
+              <div id="notifications-menu" className="header-popover" role="dialog" aria-label="Notifications">
+                <div className="popover-title">
+                  <h2>Notifications</h2>
+                  <button className="popover-close" aria-label="Close notifications" onClick={() => setOpenPanel(null)}><X size={16} /></button>
+                </div>
+                {rows.length > 0 ? (
+                  <div className="popover-item">
+                    <Bell size={17} />
+                    <div><strong>Dataset ready</strong><span>{rows.length.toLocaleString()} leads are available in your dashboard.</span></div>
+                  </div>
+                ) : (
+                  <p>You’re all caught up. Upload a CSV to see dataset updates here.</p>
+                )}
+                <button className="popover-action" onClick={() => scrollToSection("upload")}>Open CSV upload <span>→</span></button>
+              </div>
+            )}
+          </div>
 
-          <button className="profile-button" aria-label="Profile">
-            <UserCircle2 size={34} />
-          </button>
+          <div className="popover-anchor">
+            <button
+              className="profile-button"
+              aria-label="Workspace profile and preferences"
+              aria-expanded={openPanel === "profile"}
+              aria-controls="profile-menu"
+              onClick={() => setOpenPanel(openPanel === "profile" ? null : "profile")}
+            >
+              <UserCircle2 size={34} />
+            </button>
+            {openPanel === "profile" && (
+              <div id="profile-menu" className="header-popover" role="dialog" aria-label="Workspace profile and preferences">
+                <div className="workspace-profile">
+                  <span className="profile-avatar"><UserCircle2 size={24} /></span>
+                  <div><strong>LeadPilot AI</strong><span>Dashboard workspace</span></div>
+                </div>
+                <div className="popover-divider" />
+                <button className="popover-item" onClick={() => scrollToSection("ai-dashboard-settings")}>
+                  <Settings size={17} />
+                  <div><strong>Dashboard settings</strong><span>Manage display and refresh preferences.</span></div>
+                </button>
+                <button className="popover-item" onClick={() => { setDarkMode(!darkMode); setOpenPanel(null); }}>
+                  {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+                  <div><strong>Switch to {darkMode ? "light" : "dark"} theme</strong><span>Change the dashboard appearance.</span></div>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
